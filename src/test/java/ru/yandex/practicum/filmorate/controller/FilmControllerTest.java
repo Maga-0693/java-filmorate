@@ -49,6 +49,8 @@ public class FilmControllerTest {
         film.setReleaseDate(LocalDate.of(1895, 12, 27));
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertFalse(violations.isEmpty());
+        assertEquals("Дата релиза не может быть раньше 28 декабря 1895 года",
+                violations.iterator().next().getMessage());
     }
 
     @Test
