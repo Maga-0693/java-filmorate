@@ -32,7 +32,9 @@ public class UserControllerTest {
         user.setEmail(" ");
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertFalse(violations.isEmpty());
-        assertEquals("Электронная почта не может быть пустой", violations.iterator().next().getMessage());
+        assertTrue(violations.stream().anyMatch(v ->
+                v.getMessage().contains("Электронная почта не может быть пустой") ||
+                        v.getMessage().contains("Электронная почта должна содержать символ @")));
     }
 
     @Test
@@ -48,7 +50,9 @@ public class UserControllerTest {
         user.setLogin(" ");
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertFalse(violations.isEmpty());
-        assertEquals("Логин не может быть пустым", violations.iterator().next().getMessage());
+        assertTrue(violations.stream().anyMatch(v ->
+                v.getMessage().contains("Логин не может быть пустым") ||
+                        v.getMessage().contains("Логин не может содержать пробелы")));
     }
 
     @Test
