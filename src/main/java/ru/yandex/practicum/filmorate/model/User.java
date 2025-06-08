@@ -8,12 +8,12 @@ import jakarta.validation.constraints.*;
 public class User {
     private int id;
 
-    @NotBlank(message = "Адрес электронной почты должен быть действующим и должн содержать @")
-    @Email(message = "Электронная почта не может быть пустой")
+    @NotBlank(message = "Адрес электронной почты должен быть действующим")
+    @Email(message = "Электронная почта должна содержать символ @")
     private String email;
 
-    @NotBlank(message = "Логин не может быть пустым")
-    @Pattern(regexp = "\\S+", message = "Логин не может содержать пробелы")
+    @NotBlank(message = "Логин не может содержать пробелы")
+    @Pattern(regexp = "\\S+", message = "Логин не может быть пустым")
     private String login;
 
     private String name;
