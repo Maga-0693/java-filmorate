@@ -28,17 +28,17 @@ public class UserController {
 
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
-        log.info("Обновлен пользователь с id: {}", user.getId());
-        for (User u : users) {
-            if (u.getId() == user.getId()) {
-                u.setEmail(user.getEmail());
-                u.setLogin(user.getLogin());
-                u.setName(user.getName());
-                u.setBirthday(user.getBirthday());
-                return u;
+        log.info("Обновлен существующий пользователь приложения с id: {}", user.getId());
+        for (User existingUser : users) {
+            if (existingUser.getId() == user.getId()) {
+                existingUser.setEmail(user.getEmail());
+                existingUser.setLogin(user.getLogin());
+                existingUser.setName(user.getName());
+                existingUser.setBirthday(user.getBirthday());
+                return existingUser;
             }
         }
-        throw new RuntimeException("Пользователь не найден");
+        throw new RuntimeException("Существующий пользователь приложения не найден");
     }
 
     @GetMapping
