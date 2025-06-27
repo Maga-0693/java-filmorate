@@ -1,18 +1,19 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
-import lombok.extern.slf4j.Slf4j;
-import jakarta.validation.Valid;
 import java.util.List;
 
 @RestController
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
+
     private final UserService userService;
 
     @Autowired
@@ -22,23 +23,25 @@ public class UserController {
 
     @PostMapping
     public User createUser(@Valid @RequestBody User user) {
-        log.info("Создан новый пользователь: {}", user.getLogin());
+        log.info("Создан пользователь: {}", user.getLogin());
         return userService.createUser(user);
     }
 
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
-        log.info("Обновлен существующий пользователь приложения с id: {}", user.getId());
+        log.info("Обновлен пользователь с id: {}", user.getId());
         return userService.updateUser(user);
     }
 
     @GetMapping
     public List<User> getAllUsers() {
+
         return userService.getAllUsers();
     }
 
     @PutMapping("/{id}/friends/{friendId}")
     public void addFriend(@PathVariable int id, @PathVariable int friendId) {
+
         userService.addFriend(id, friendId);
     }
 
@@ -49,6 +52,7 @@ public class UserController {
 
     @GetMapping("/{id}/friends")
     public List<User> getFriends(@PathVariable int id) {
+
         return userService.getFriends(id);
     }
 
