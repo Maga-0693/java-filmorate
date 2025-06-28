@@ -18,6 +18,9 @@ import java.util.Map;
 @Slf4j
 public class FilmController {
 
+    private static final String LIKE_PATH = "/{id}/like/{userId}";
+    private static final String POPULAR_PATH = "/popular";
+
     private final FilmService filmService;
 
     @Autowired
@@ -46,27 +49,27 @@ public class FilmController {
         return ResponseEntity.ok(films);
     }
 
-    @PutMapping("/{id}/like/{userId}")
+    @PutMapping(LIKE_PATH)
     public ResponseEntity<?> addLike(@PathVariable int id, @PathVariable int userId) {
         try {
             filmService.addLike(id, userId);
             return ResponseEntity.ok().body(Map.of("message", "Лайк успешно добавлен"));
-        } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        } catch (NotFoundException notFoundEx) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", notFoundEx.getMessage()));
         }
     }
 
-    @DeleteMapping("/{id}/like/{userId}")
+    @DeleteMapping(LIKE_PATH)
     public ResponseEntity<?> removeLike(@PathVariable int id, @PathVariable int userId) {
         try {
             filmService.removeLike(id, userId);
             return ResponseEntity.ok().body(Map.of("message", "Лайк успешно удален"));
-        } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        } catch (NotFoundException notFoundEx) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", notFoundEx.getMessage()));
         }
     }
 
-    @GetMapping("/popular")
+    @GetMapping(POPULAR_PATH)
     public ResponseEntity<List<Film>> getPopularFilms(@RequestParam(defaultValue = "10") int count) {
         List<Film> popularFilms = filmService.getPopularFilms(count);
         return ResponseEntity.ok(popularFilms);

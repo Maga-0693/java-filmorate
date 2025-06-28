@@ -16,6 +16,7 @@ public class UserService {
 
     @Autowired
     public UserService(UserStorage userStorage) {
+
         this.userStorage = userStorage;
     }
 
@@ -28,7 +29,7 @@ public class UserService {
 
     public User updateUser(User user) {
         if (userStorage.getUserById(user.getId()) == null) {
-            throw new NotFoundException("Пользователь с id " + user.getId() + " не найден");
+            throw new NotFoundException(String.format("Пользователь с id %d не найден", user.getId()));
         }
         return userStorage.updateUser(user);
     }
@@ -61,7 +62,7 @@ public class UserService {
     public List<User> getFriends(int userId) {
         User user = userStorage.getUserById(userId);
         if (user == null) {
-            throw new NotFoundException("Пользователь с id " + userId + " не найден");
+            throw new NotFoundException(String.format("Пользователь с id %d не найден", userId));
         }
         return user.getFriends().stream()
                 .map(userStorage::getUserById)

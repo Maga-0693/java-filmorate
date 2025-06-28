@@ -30,7 +30,7 @@ public class FilmService {
 
     public Film updateFilm(Film film) {
         if (filmStorage.getFilmById(film.getId()) == null) {
-            throw new NotFoundException("Фильм с id " + film.getId() + " не найден");
+            throw new NotFoundException(String.format("Фильм с id %d не найден", film.getId()));
         }
         return filmStorage.updateFilm(film);
     }
@@ -43,11 +43,11 @@ public class FilmService {
     public void addLike(int filmId, int userId) {
         Film film = filmStorage.getFilmById(filmId);
         if (film == null) {
-            throw new NotFoundException("Фильм с id " + filmId + " не найден");
+            throw new NotFoundException(String.format("Фильм с id %d не найден", filmId));
         }
 
         if (userStorage.getUserById(userId) == null) {
-            throw new NotFoundException("Пользователь с id " + userId + " не найден");
+            throw new NotFoundException(String.format("Пользователь с id %d не найден", userId));
         }
         film.getLikes().add(userId);
     }
@@ -55,10 +55,10 @@ public class FilmService {
     public void removeLike(int filmId, int userId) {
         Film film = filmStorage.getFilmById(filmId);
         if (film == null) {
-            throw new NotFoundException("Фильм с id " + filmId + " не найден");
+            throw new NotFoundException(String.format("Фильм с id %d не найден", filmId));
         }
         if (!film.getLikes().contains(userId)) {
-            throw new NotFoundException("Пользователь с id " + userId + " не найден");
+            throw new NotFoundException(String.format("Пользователь с id %d не найден", userId));
         }
         film.getLikes().remove(userId);
     }
