@@ -13,11 +13,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @JdbcTest
 @AutoConfigureTestDatabase
 @Import(UserDbStorage.class)
-class FilmoRateApplicationTests {
+public class FilmorateApplicationTests {
 	private final UserDbStorage userStorage;
 
 	@Autowired
-	public FilmoRateApplicationTests(UserDbStorage userStorage) {
+	public FilmorateApplicationTests(UserDbStorage userStorage) {
+
 		this.userStorage = userStorage;
 	}
 
@@ -32,7 +33,7 @@ class FilmoRateApplicationTests {
 		User createdUser = userStorage.createUser(testUser);
 
 		Optional<User> foundUser = userStorage.getUserById(createdUser.getId());
-		
+
 		assertThat(foundUser)
 				.isPresent()
 				.hasValueSatisfying(user ->
