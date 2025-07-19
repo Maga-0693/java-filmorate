@@ -4,13 +4,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.Film;
-
+import ru.yandex.practicum.filmorate.model.Mpa;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.Set;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -21,11 +21,15 @@ public class FilmControllerTest {
     @BeforeEach
     void setUp() {
         validator = Validation.buildDefaultValidatorFactory().getValidator();
-        film = new Film();
-        film.setName("Название фильма");
-        film.setDescription("Описание фильма");
-        film.setReleaseDate(LocalDate.of(2000, 1, 1));
-        film.setDuration(120);
+        film = Film.builder()
+                .name("Название фильма")
+                .description("Описание фильма")
+                .releaseDate(LocalDate.of(2000, 1, 1))
+                .duration(120)
+                .mpaId(new Mpa(1, "G", "General Audiences"))
+                .genres(new HashSet<>())
+                .likes(new HashSet<>())
+                .build();
     }
 
     @Test
@@ -54,16 +58,59 @@ public class FilmControllerTest {
     }
 
     @Test
+    void whenReleaseDateIsMinAllowed_thenValidationPasses() {
+        film.setReleaseDate(LocalDate.of(1895, 12, 28));
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertTrue(violations.isEmpty());
+    }
+
+    @Test
     void whenDurationIsNegative_thenValidationFails() {
         film.setDuration(-1);
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertFalse(violations.isEmpty());
-        assertEquals("Продолжительность фильма должна быть положительным числом", violations.iterator().next().getMessage());
+        assertEquals("Продолжительность фильма должна быть положительным числом",
+                violations.iterator().next().getMessage());
+    }
+
+    @Test
+    void whenDurationIsZero_thenValidationFails() {
+        film.setDuration(0);
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertFalse(violations.isEmpty());
     }
 
     @Test
     void whenValidFilm_thenNoValidationErrors() {
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertTrue(violations.isEmpty());
+    }
+
+    @Test
+    void whenMpaIsNull_thenValidationFails() {
+        film.setMpaId(null);
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertFalse(violations.isEmpty());
+    }
+
+    @Test
+    void whenReleaseDateIsNull_thenValidationFails() {
+        film.setReleaseDate(null);
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertFalse(violations.isEmpty());
+    }
+
+    @Test
+    void whenDescriptionIsNull_thenValidationPasses() {
+        film.setDescription(null);
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertTrue(violations.isEmpty());
+    }
+
+    @Test
+    void whenNameIsNull_thenValidationFails() {
+        film.setName(null);
+        Set<ConstraintViolation<Film>> violations = validator.validate(film);
+        assertFalse(violations.isEmpty());
     }
 }

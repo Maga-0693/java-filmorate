@@ -3,22 +3,23 @@ package ru.yandex.practicum.filmorate;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
-import org.springframework.context.annotation.Import;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
+
 import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
-@JdbcTest
-@AutoConfigureTestDatabase
-@Import(UserDbStorage.class)
+@SpringBootTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ActiveProfiles("test")
 public class FilmorateApplicationTests {
 	private final UserDbStorage userStorage;
 
 	@Autowired
 	public FilmorateApplicationTests(UserDbStorage userStorage) {
-
 		this.userStorage = userStorage;
 	}
 
@@ -29,7 +30,6 @@ public class FilmorateApplicationTests {
 				.login("testLogin")
 				.birthday(java.time.LocalDate.now())
 				.build();
-
 		User createdUser = userStorage.createUser(testUser);
 
 		Optional<User> foundUser = userStorage.getUserById(createdUser.getId());
