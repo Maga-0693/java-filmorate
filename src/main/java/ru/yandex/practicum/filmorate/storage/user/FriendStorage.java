@@ -7,14 +7,24 @@ import java.util.Map;
 
 public interface FriendStorage {
     void addFriend(int userId, int friendId, FriendshipStatus status);
+
     void removeFriend(int userId, int friendId);
-    void confirmFriendship(int userId, int friendId); // Единый метод подтверждения
-    void updateFriendshipStatus(int userId, int friendId, FriendshipStatus status); // Дополнительный метод
+
+    void confirmFriendship(int userId, int friendId);
+
+    void updateFriendshipStatus(int userId, int friendId, FriendshipStatus status);
+
     boolean hasFriendshipRequest(int requesterId, int recipientId);
+
     List<Integer> getFriendsIds(int userId);
+
     Map<Integer, FriendshipStatus> getFriendsWithStatus(int userId);
+
     List<Integer> getFriendshipRequests(int userId);
+
     List<Integer> getConfirmedFriends(int userId);
+
     List<User> getFriends(int userId);
+
     List<User> getCommonFriends(int userId1, int userId2);
 }
