@@ -1,12 +1,14 @@
 package ru.yandex.practicum.filmorate.model;
 
+import lombok.Builder;
 import lombok.Data;
-import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 import jakarta.validation.constraints.*;
+import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 @Data
+@Builder(toBuilder = true)
 public class User {
     private int id;
 
@@ -24,5 +26,24 @@ public class User {
     @PastOrPresent(message = "Дата рождения не может быть в будущем")
     private LocalDate birthday;
 
-    private Set<Integer> friends = new HashSet<>();
+    @Builder.Default
+    private Map<Integer, FriendshipStatus> friends = new HashMap<>();
+
+    public enum FriendshipStatus {
+        UNCONFIRMED, CONFIRMED
+    }
+
+    public User() {
+        this.friends = new HashMap<>();
+    }
+
+    public User(int id, String email, String login, String name,
+                LocalDate birthday, Map<Integer, FriendshipStatus> friends) {
+        this.id = id;
+        this.email = email;
+        this.login = login;
+        this.name = name;
+        this.birthday = birthday;
+        this.friends = friends != null ? friends : new HashMap<>();
+    }
 }

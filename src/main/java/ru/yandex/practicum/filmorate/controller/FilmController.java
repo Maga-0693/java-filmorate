@@ -31,14 +31,14 @@ public class FilmController {
 
     @PostMapping
     public ResponseEntity<Film> addFilm(@Valid @RequestBody Film film) {
-        log.info("Добавлен фильм: {}", film.getName());
+        log.info("Добавление фильма: {}", film.getName());
         Film createdFilm = filmService.addFilm(film);
         return ResponseEntity.ok(createdFilm);
     }
 
     @PutMapping
     public ResponseEntity<Film> updateFilm(@Valid @RequestBody Film film) {
-        log.info("Обновлен фильм с id: {}", film.getId());
+        log.info("Обновление фильма с id: {}", film.getId());
         Film updatedFilm = filmService.updateFilm(film);
         return ResponseEntity.ok(updatedFilm);
     }

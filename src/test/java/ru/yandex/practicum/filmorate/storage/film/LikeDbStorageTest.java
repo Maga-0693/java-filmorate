@@ -1,0 +1,62 @@
+package ru.yandex.practicum.filmorate.storage.film;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
+import org.springframework.context.annotation.Import;
+import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.genre.GenreDbStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
+import java.time.LocalDate;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+@JdbcTest
+@AutoConfigureTestDatabase
+@Import({FilmDbStorage.class, UserDbStorage.class, LikeDbStorage.class, GenreDbStorage.class})
+class LikeDbStorageTest {
+
+    @Autowired
+    private FilmDbStorage filmStorage;
+
+    @Autowired
+    private UserDbStorage userStorage;
+
+    @Autowired
+    private LikeDbStorage likeStorage;
+
+    @Test
+    void shouldAddAndRemoveLike() {
+        Film film = Film.builder()
+                .name("Test Film")
+                .description("Test Description")
+                .releaseDate(LocalDate.of(2000, 1, 1))
+                .duration(120)
+                .mpaId(Mpa.builder().id(1).build())
+                .build();
+
+        User user = User.builder()
+                .email("test@example.com")
+                .login("testLogin")
+                .name("Test User")
+                .birthday(LocalDate.of(1990, 1, 1))
+                .build();
+
+        Film createdFilm = filmStorage.addFilm(film);
+        User createdUser = userStorage.createUser(user);
+
+        likeStorage.addLike(createdFilm.getId(), createdUser.getId());
+
+        List<Integer> likes = likeStorage.getLikesByFilmId(createdFilm.getId());
+        assertThat(likes).hasSize(1);
+        assertThat(likes).contains(createdUser.getId());
+
+        likeStorage.removeLike(createdFilm.getId(), createdUser.getId());
+        likes = likeStorage.getLikesByFilmId(createdFilm.getId());
+        assertThat(likes).isEmpty();
+    }
+}

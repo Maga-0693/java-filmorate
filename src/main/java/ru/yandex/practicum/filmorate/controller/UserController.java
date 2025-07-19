@@ -1,9 +1,11 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -11,30 +13,29 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/users")
-@Slf4j
 public class UserController {
-
-    private static final String FRIENDS_PATH = "/{id}/friends";
-    private static final String FRIEND_PATH = "/{id}/friends/{friendId}";
-    private static final String COMMON_FRIENDS_PATH = "/{id}/friends/common/{otherId}";
-
     private final UserService userService;
 
     @Autowired
     public UserController(UserService userService) {
+
         this.userService = userService;
     }
 
     @PostMapping
     public User createUser(@Valid @RequestBody User user) {
-        log.info("Создан пользователь: {}", user.getLogin());
+
         return userService.createUser(user);
     }
 
     @PutMapping
-    public User updateUser(@Valid @RequestBody User user) {
-        log.info("Обновлен пользователь с id: {}", user.getId());
-        return userService.updateUser(user);
+    public ResponseEntity<User> updateUser(@Valid @RequestBody User user) {
+        try {
+            User updatedUser = userService.updateUser(user);
+            return ResponseEntity.ok(updatedUser);
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 
     @GetMapping
@@ -43,24 +44,47 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @PutMapping(FRIEND_PATH)
+    @GetMapping("/{id}")
+    public User getUserById(@PathVariable int id) {
+
+        return userService.getUserById(id);
+    }
+
+    @PutMapping("/{id}/friends/{friendId}")
     public void addFriend(@PathVariable int id, @PathVariable int friendId) {
 
         userService.addFriend(id, friendId);
     }
 
-    @DeleteMapping(FRIEND_PATH)
+    @DeleteMapping("/{id}/friends/{friendId}")
     public void removeFriend(@PathVariable int id, @PathVariable int friendId) {
         userService.removeFriend(id, friendId);
     }
 
-    @GetMapping(FRIENDS_PATH)
+    @PutMapping("/{id}/friends/{friendId}/confirm")
+    public void confirmFriendship(@PathVariable int id, @PathVariable int friendId) {
+        userService.confirmFriendship(id, friendId);
+    }
+
+    @GetMapping("/{id}/friends")
     public List<User> getFriends(@PathVariable int id) {
 
         return userService.getFriends(id);
     }
 
-    @GetMapping(COMMON_FRIENDS_PATH)
+    @GetMapping("/{id}/friends/confirmed")
+    public List<User> getConfirmedFriends(@PathVariable int id) {
+
+        return userService.getConfirmedFriends(id);
+    }
+
+    @GetMapping("/{id}/friends/requests")
+    public List<User> getFriendshipRequests(@PathVariable int id) {
+
+        return userService.getFriendshipRequests(id);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> getCommonFriends(@PathVariable int id, @PathVariable int otherId) {
         return userService.getCommonFriends(id, otherId);
     }

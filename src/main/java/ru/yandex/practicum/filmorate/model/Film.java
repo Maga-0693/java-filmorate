@@ -1,14 +1,14 @@
 package ru.yandex.practicum.filmorate.model;
 
-import jakarta.validation.constraints.*;
+import lombok.Builder;
 import lombok.Data;
-import ru.yandex.practicum.filmorate.validation.ReleaseDate;
-
+import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
 @Data
+@Builder
 public class Film {
     private int id;
 
@@ -19,11 +19,31 @@ public class Film {
     private String description;
 
     @NotNull(message = "Дата релиза не может быть пустой")
-    @ReleaseDate
     private LocalDate releaseDate;
 
     @Positive(message = "Продолжительность фильма должна быть положительным числом")
     private int duration;
 
-    private Set<Integer> likes = new HashSet<>();
+    private Mpa mpaId;
+    private Set<Genre> genres;
+    private Set<Integer> likes;
+
+    // Конструктор по умолчанию
+    public Film() {
+        this.genres = new HashSet<>();
+        this.likes = new HashSet<>();
+    }
+
+    // Полный конструктор
+    public Film(int id, String name, String description, LocalDate releaseDate,
+                int duration, Mpa mpa, Set<Genre> genres, Set<Integer> likes) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+        this.mpaId = mpa;
+        this.genres = genres != null ? genres : new HashSet<>();
+        this.likes = likes != null ? likes : new HashSet<>();
+    }
 }
