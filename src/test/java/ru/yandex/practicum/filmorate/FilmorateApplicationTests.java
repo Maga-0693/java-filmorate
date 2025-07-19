@@ -23,7 +23,6 @@ class FilmoRateApplicationTests {
 
 	@Test
 	public void testFindUserById() {
-		// Создаем тестового пользователя
 		User testUser = User.builder()
 				.email("test@example.com")
 				.login("testLogin")
@@ -32,10 +31,8 @@ class FilmoRateApplicationTests {
 
 		User createdUser = userStorage.createUser(testUser);
 
-		// Ищем пользователя (используем правильный метод get)
 		Optional<User> foundUser = userStorage.getUserById(createdUser.getId());
-
-		// Проверяем результаты
+		
 		assertThat(foundUser)
 				.isPresent()
 				.hasValueSatisfying(user ->

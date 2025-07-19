@@ -65,7 +65,6 @@ public class FilmDbStorage implements FilmStorage {
                 film.getMpaId().getId(),
                 film.getId());
 
-        // Обновляем жанры
         filmGenreDbStorage.removeGenresFromFilm(film.getId());
         if (film.getGenres() != null) {
             film.getGenres().forEach(genre ->

@@ -6,7 +6,10 @@ import java.util.Optional;
 
 public interface UserStorage {
     User createUser(User user);
+
     User updateUser(User user);
+
     List<User> getAllUsers();
-    Optional<User> getUserById(int id); // Изменено на Optional<User>
+
+    Optional<User> getUserById(int id);
 }

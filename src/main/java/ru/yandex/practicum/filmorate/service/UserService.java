@@ -45,10 +45,8 @@ public class UserService {
         User friend = getUserByIdOrThrow(friendId);
 
         if (friendStorage.hasFriendshipRequest(friendId, userId)) {
-            // Если есть встречный запрос - подтверждаем дружбу
             friendStorage.confirmFriendship(userId, friendId);
         } else {
-            // Иначе создаём новый запрос
             friendStorage.addFriend(userId, friendId, User.FriendshipStatus.UNCONFIRMED);
         }
     }

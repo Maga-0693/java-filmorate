@@ -28,13 +28,11 @@ public class Film {
     private Set<Genre> genres;
     private Set<Integer> likes;
 
-    // Конструктор по умолчанию
     public Film() {
         this.genres = new HashSet<>();
         this.likes = new HashSet<>();
     }
 
-    // Полный конструктор
     public Film(int id, String name, String description, LocalDate releaseDate,
                 int duration, Mpa mpa, Set<Genre> genres, Set<Integer> likes) {
         this.id = id;

@@ -34,7 +34,6 @@ public class FriendshipDbStorage implements FriendStorage {
 
     @Override
     public void confirmFriendship(int userId, int friendId) {
-        // Специализированный метод для подтверждения дружбы
         updateFriendshipStatus(userId, friendId, FriendshipStatus.CONFIRMED);
         updateFriendshipStatus(friendId, userId, FriendshipStatus.CONFIRMED);
     }
@@ -49,7 +48,6 @@ public class FriendshipDbStorage implements FriendStorage {
         }
     }
 
-    // Остальные методы остаются без изменений
     @Override
     public boolean hasFriendshipRequest(int requesterId, int recipientId) {
         String sql = "SELECT COUNT(*) FROM friends WHERE user_id = ? AND friend_id = ? AND status = 'UNCONFIRMED'";
