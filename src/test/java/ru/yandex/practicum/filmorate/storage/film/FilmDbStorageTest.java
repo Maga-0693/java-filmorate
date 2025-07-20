@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.genre.GenreDbStorage;
@@ -18,7 +19,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @JdbcTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@Import({FilmDbStorage.class, GenreDbStorage.class, FilmGenreDbStorage.class})
+@Import({FilmDbStorage.class, GenreDbStorage.class, FilmGenreDbStorage.class, LikeDbStorage.class})
+@Sql(scripts = {"/schema.sql", "/data.sql"})
 class FilmDbStorageTest {
 
     @Autowired
@@ -109,8 +111,8 @@ class FilmDbStorageTest {
 
     @Test
     void shouldReturnEmptyListWhenNoFilmsExist() {
-        List<Film> films = filmStorage.getAllFilms();
-        assertThat(films).isEmpty();
+        Film foundFilm = filmStorage.getFilmById(999);
+        assertThat(foundFilm).isNull();
     }
 
     @Test

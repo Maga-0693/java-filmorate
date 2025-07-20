@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.jdbc.JdbcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.User.FriendshipStatus;
 
@@ -19,6 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @JdbcTest
 @AutoConfigureTestDatabase
 @Import({UserDbStorage.class, FriendshipDbStorage.class})
+@Sql(scripts = {"/schema.sql"})
 class FriendshipDbStorageTest {
 
     @Autowired
@@ -72,17 +74,20 @@ class FriendshipDbStorageTest {
 
     @Test
     void shouldConfirmFriendship() {
+        // 1. User1 отправляет запрос дружбы User2
         friendshipStorage.addFriend(user1.getId(), user2.getId(), FriendshipStatus.UNCONFIRMED);
 
+        // 2. User2 подтверждает дружбу с User1
         friendshipStorage.confirmFriendship(user2.getId(), user1.getId());
 
+        // 3. Проверяем друзей User1
         Map<Integer, FriendshipStatus> user1Friends = friendshipStorage.getFriendsWithStatus(user1.getId());
-        Map<Integer, FriendshipStatus> user2Friends = friendshipStorage.getFriendsWithStatus(user2.getId());
-
         assertThat(user1Friends)
                 .hasSize(1)
                 .containsEntry(user2.getId(), FriendshipStatus.CONFIRMED);
 
+        // 4. Проверяем друзей User2
+        Map<Integer, FriendshipStatus> user2Friends = friendshipStorage.getFriendsWithStatus(user2.getId());
         assertThat(user2Friends)
                 .hasSize(1)
                 .containsEntry(user1.getId(), FriendshipStatus.CONFIRMED);

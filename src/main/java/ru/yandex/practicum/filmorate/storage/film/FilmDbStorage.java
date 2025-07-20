@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -69,8 +70,9 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getAllFilms() {
-        String sql = "SELECT f.*, m.mpa_name, m.description as mpa_description " +
-                "FROM films f JOIN mpa_ratings m ON f.mpa_id = m.mpa_id";
+        String sql = "SELECT f.*, m.mpa_name, m.description AS mpa_description " +
+                "FROM films f JOIN mpa_ratings m ON f.mpa_id = m.mpa_id"; // Исправлено mpa на mpa_ratings
+
         return jdbcTemplate.query(sql, (rs, rowNum) -> {
             Film film = new Film();
             film.setId(rs.getInt("film_id"));
@@ -78,37 +80,43 @@ public class FilmDbStorage implements FilmStorage {
             film.setDescription(rs.getString("description"));
             film.setReleaseDate(rs.getDate("release_date").toLocalDate());
             film.setDuration(rs.getInt("duration"));
-            // Ошибки 5-8: создание Mpa через конструктор
+
             Mpa mpa = new Mpa(
                     rs.getInt("mpa_id"),
                     rs.getString("mpa_name"),
                     rs.getString("mpa_description")
             );
             film.setMpa(mpa);
+
             return film;
         });
     }
 
     @Override
     public Film getFilmById(int id) {
-        String sql = "SELECT f.*, m.mpa_name, m.description as mpa_description " +
-                "FROM films f JOIN mpa_ratings m ON f.mpa_id = m.mpa_id " +
-                "WHERE f.film_id = ?";
-        return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
-            Film film = new Film();
-            film.setId(rs.getInt("film_id"));
-            film.setName(rs.getString("name"));
-            film.setDescription(rs.getString("description"));
-            film.setReleaseDate(rs.getDate("release_date").toLocalDate());
-            film.setDuration(rs.getInt("duration"));
-            // Ошибки 9-12: создание Mpa через конструктор
-            Mpa mpa = new Mpa(
-                    rs.getInt("mpa_id"),
-                    rs.getString("mpa_name"),
-                    rs.getString("mpa_description")
-            );
-            film.setMpa(mpa);
-            return film;
-        }, id);
+        String sql = "SELECT f.*, m.mpa_name, m.description AS mpa_description " +
+                "FROM films f JOIN mpa_ratings m ON f.mpa_id = m.mpa_id WHERE f.film_id = ?";
+
+        try {
+            return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
+                Film film = new Film();
+                film.setId(rs.getInt("film_id"));  // Используем film_id вместо id
+                film.setName(rs.getString("name"));
+                film.setDescription(rs.getString("description"));
+                film.setReleaseDate(rs.getDate("release_date").toLocalDate());
+                film.setDuration(rs.getInt("duration"));
+
+                Mpa mpa = new Mpa(
+                        rs.getInt("mpa_id"),
+                        rs.getString("mpa_name"),
+                        rs.getString("mpa_description")
+                );
+                film.setMpa(mpa);
+
+                return film;
+            }, id);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 }

@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.User;
 
 import jakarta.validation.ConstraintViolation;
@@ -13,7 +12,6 @@ import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
 public class UserControllerTest {
     private Validator validator;
     private User user;

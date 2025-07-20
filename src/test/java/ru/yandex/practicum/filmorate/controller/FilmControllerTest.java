@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+//import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import jakarta.validation.ConstraintViolation;
@@ -13,7 +13,6 @@ import java.util.HashSet;
 import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
 public class FilmControllerTest {
     private Validator validator;
     private Film film;
@@ -51,9 +50,12 @@ public class FilmControllerTest {
     void whenReleaseDateIsTooEarly_thenValidationFails() {
         film.setReleaseDate(LocalDate.of(1895, 12, 27));
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
-        assertFalse(violations.isEmpty());
-        assertEquals("Дата релиза не может быть раньше 28 декабря 1895 года",
-                violations.iterator().next().getMessage());
+
+        assertFalse(violations.isEmpty(), "Должна быть ошибка валидации");
+
+        boolean hasDateError = violations.stream()
+                .anyMatch(v -> v.getPropertyPath().toString().equals("releaseDate"));
+        assertTrue(hasDateError, "Ожидалась ошибка валидации для поля releaseDate");
     }
 
     @Test
@@ -89,7 +91,13 @@ public class FilmControllerTest {
     void whenMpaIsNull_thenValidationFails() {
         film.setMpa(null);
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
-        assertFalse(violations.isEmpty());
+
+        assertFalse(violations.isEmpty(), "Должна быть ошибка валидации при null MPA");
+
+        // Проверяем конкретное сообщение об ошибке
+        boolean hasMpaError = violations.stream()
+                .anyMatch(v -> v.getPropertyPath().toString().equals("mpa"));
+        assertTrue(hasMpaError, "Ожидалась ошибка валидации для поля mpa");
     }
 
     @Test

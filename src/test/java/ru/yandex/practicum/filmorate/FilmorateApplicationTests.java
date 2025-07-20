@@ -4,7 +4,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
+import ru.yandex.practicum.filmorate.config.TestConfig;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
@@ -14,15 +17,12 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
+@AutoConfigureTestDatabase
+@Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:schema.sql")
 public class FilmorateApplicationTests {
-	private final UserDbStorage userStorage;
-
 	@Autowired
-	public FilmorateApplicationTests(UserDbStorage userStorage) {
-		this.userStorage = userStorage;
-	}
+	private UserDbStorage userStorage;
 
 	@Test
 	public void testFindUserById() {
