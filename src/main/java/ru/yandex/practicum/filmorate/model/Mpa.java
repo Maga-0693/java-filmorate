@@ -10,9 +10,9 @@ public class Mpa {
     private String name;
     private String description;
 
-    public Mpa(int mpa_id, String mpa_name, String description) {
-        this.id = mpa_id;
-        this.name = mpa_name;
+    public Mpa(int mpaId, String mpaName, String description) {
+        this.id = mpaId;
+        this.name = mpaName;
         this.description = description;
     }
 
