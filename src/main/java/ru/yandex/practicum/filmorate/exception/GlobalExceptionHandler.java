@@ -28,11 +28,9 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(ValidationException.class)
-    public ResponseEntity<Map<String, String>> handleValidationException(ValidationException exception) {
-        log.warn("Ошибка валидации бизнес-логики: {}", exception.getMessage());
-        Map<String, String> body = new HashMap<>();
-        body.put("error", exception.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    public ResponseEntity<Map<String, String>> handleValidationException(ValidationException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("error", ex.getMessage()));
     }
 
     @ExceptionHandler(NotFoundException.class)
@@ -44,10 +42,15 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, String>> handleAllExceptions(Exception exception) {
-        log.error("Внутренняя ошибка сервера: ", exception);
-        Map<String, String> body = new HashMap<>();
-        body.put("error", "Произошла непредвиденная ошибка на сервере");
-        return ResponseEntity.internalServerError().body(body);
+    public ResponseEntity<Map<String, String>> handleAllExceptions(Exception ex) {
+        log.error("Internal server error", ex);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(Map.of("error", "Internal server error"));
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<Map<String, String>> handleNotFoundException(NotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("error", ex.getMessage()));
     }
 }

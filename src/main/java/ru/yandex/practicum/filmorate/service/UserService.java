@@ -46,26 +46,16 @@ public class UserService {
 
     @Transactional
     public void addFriend(int userId, int friendId) {
-        // Получаем пользователей с полной информацией о друзьях
-        User user = getUserByIdWithFriends(userId);
-        User friend = getUserByIdWithFriends(friendId);
-
-        // Проверяем, не пытается ли пользователь добавить сам себя
         if (userId == friendId) {
             throw new ValidationException("Пользователь не может добавить сам себя в друзья");
         }
 
-        // Проверяем существование дружбы
-        if (user.getFriends().containsKey(friendId)) {
-            throw new ValidationException("Эти пользователи уже дружат");
-        }
+        User user = getUserByIdOrThrow(userId);
+        User friend = getUserByIdOrThrow(friendId);
 
-        // Добавляем дружбу
-        if (friend.getFriends().containsKey(userId)) {
-            // Если есть встречный запрос - подтверждаем дружбу
+        if (friendStorage.hasFriendshipRequest(friendId, userId)) {
             friendStorage.confirmFriendship(userId, friendId);
         } else {
-            // Иначе создаем новый запрос
             friendStorage.addFriend(userId, friendId, User.FriendshipStatus.UNCONFIRMED);
         }
     }

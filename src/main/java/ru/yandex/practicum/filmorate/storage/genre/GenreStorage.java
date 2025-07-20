@@ -13,4 +13,6 @@ public interface GenreStorage {
     void addFilmGenre(int filmId, int genreId);
 
     void removeFilmGenres(int filmId);
+
+    boolean existsById(int id);
 }

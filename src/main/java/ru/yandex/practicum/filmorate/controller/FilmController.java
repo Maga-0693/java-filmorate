@@ -32,10 +32,10 @@ public class FilmController {
         try {
             Film createdFilm = filmService.addFilm(film);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdFilm);
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
         } catch (ValidationException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Произошла непредвиденная ошибка на сервере"));
         }
     }
 
@@ -46,15 +46,14 @@ public class FilmController {
             return ResponseEntity.ok(updatedFilm);
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Произошла непредвиденная ошибка на сервере"));
+        } catch (ValidationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
         }
     }
 
     @GetMapping
     public ResponseEntity<List<Film>> getAllFilms() {
-        List<Film> films = filmService.getAllFilms();
-        return ResponseEntity.ok(films);
+        return ResponseEntity.ok(filmService.getAllFilms());
     }
 
     @PutMapping("/{id}/like/{userId}")
@@ -64,8 +63,6 @@ public class FilmController {
             return ResponseEntity.ok().build();
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Произошла непредвиденная ошибка на сервере"));
         }
     }
 
@@ -83,7 +80,6 @@ public class FilmController {
 
     @GetMapping("/popular")
     public ResponseEntity<List<Film>> getPopularFilms(@RequestParam(defaultValue = "10") int count) {
-        List<Film> popularFilms = filmService.getPopularFilms(count);
-        return ResponseEntity.ok(popularFilms);
+        return ResponseEntity.ok(filmService.getPopularFilms(count));
     }
 }

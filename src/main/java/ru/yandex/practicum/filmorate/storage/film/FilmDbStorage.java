@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import org.springframework.context.annotation.Primary;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -7,13 +8,17 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.*;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+@Primary
 @Component
 public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
@@ -34,14 +39,19 @@ public class FilmDbStorage implements FilmStorage {
             PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             ps.setString(1, film.getName());
             ps.setString(2, film.getDescription());
-            ps.setDate(3, java.sql.Date.valueOf(film.getReleaseDate()));
+            ps.setDate(3, Date.valueOf(film.getReleaseDate()));
             ps.setInt(4, film.getDuration());
             ps.setInt(5, film.getMpa().getId());
             return ps;
         }, keyHolder);
 
         film.setId(Objects.requireNonNull(keyHolder.getKey()).intValue());
-        return film;
+
+        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
+            updateFilmGenres(film.getId(), film.getGenres());
+        }
+
+        return getFilmById(film.getId());
     }
 
     @Override
@@ -52,17 +62,12 @@ public class FilmDbStorage implements FilmStorage {
                 film.getDescription(),
                 film.getReleaseDate(),
                 film.getDuration(),
-                film.getMpa().getId(),  // Проверяем, что MPA не null
+                film.getMpa().getId(),
                 film.getId());
 
-        // Обновляем жанры
-        filmGenreDbStorage.removeGenresFromFilm(film.getId());
-        if (film.getGenres() != null) {
-            film.getGenres().forEach(genre ->
-                    filmGenreDbStorage.addGenreToFilm(film.getId(), genre.getId())
-            );
-        }
-        return film;  // Возвращаем обновлённый фильм
+        updateFilmGenres(film.getId(), film.getGenres());
+
+        return getFilmById(film.getId());
     }
 
     @Override
@@ -79,6 +84,18 @@ public class FilmDbStorage implements FilmStorage {
             film.setMpa(new Mpa(rs.getInt("mpa_id"), rs.getString("mpa_name"), rs.getString("mpa_description")));
             return film;
         });
+    }
+
+    private void updateFilmGenres(int filmId, Set<Genre> genres) {
+        String deleteSql = "DELETE FROM film_genres WHERE film_id = ?";
+        jdbcTemplate.update(deleteSql, filmId);
+
+        if (genres != null && !genres.isEmpty()) {
+            String insertSql = "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)";
+            jdbcTemplate.batchUpdate(insertSql, genres.stream()
+                    .map(genre -> new Object[]{filmId, genre.getId()})
+                    .collect(Collectors.toList()));
+        }
     }
 
     @Override

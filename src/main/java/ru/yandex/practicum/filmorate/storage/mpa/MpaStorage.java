@@ -8,4 +8,6 @@ public interface MpaStorage {
     List<Mpa> getAllMpa();
 
     Optional<Mpa> getMpaById(int id);
+
+    boolean existsById(int id);
 }

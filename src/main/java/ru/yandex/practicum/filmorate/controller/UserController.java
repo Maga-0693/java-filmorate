@@ -10,7 +10,6 @@ import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -71,17 +70,11 @@ public class UserController {
     public ResponseEntity<?> addFriend(@PathVariable int id, @PathVariable int friendId) {
         try {
             userService.addFriend(id, friendId);
-            User user1 = userService.getUserById(id);
-            User user2 = userService.getUserById(friendId);
-            Map<String, Object> response = new HashMap<>();
-            response.put("user1", user1);
-            response.put("user2", user2);
-            response.put("message", "Дружба успешно добавлена");
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok().build();
         } catch (NotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Произошла непредвиденная ошибка на сервере"));
+        } catch (ValidationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
         }
     }
 
