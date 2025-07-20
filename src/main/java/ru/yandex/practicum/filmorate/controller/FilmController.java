@@ -56,27 +56,26 @@ public class FilmController {
         return ResponseEntity.ok(filmService.getAllFilms());
     }
 
-    @PutMapping("/{id}/like/{userId}")
-    public ResponseEntity<?> addLike(@PathVariable int id, @PathVariable int userId) {
-        try {
-            filmService.addLike(id, userId);
-            return ResponseEntity.ok().build();
-        } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
-        }
-    }
-
-    @DeleteMapping("/{id}/like/{userId}")
-    public ResponseEntity<?> removeLike(@PathVariable int id, @PathVariable int userId) {
-        try {
-            filmService.removeLike(id, userId);
-            return ResponseEntity.noContent().build();
-        } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Произошла непредвиденная ошибка на сервере"));
-        }
-    }
+//    @PutMapping("/{id}/like/{userId}")
+//    public ResponseEntity<?> addLike(@PathVariable int id, @PathVariable int userId) {
+//        try {
+//            filmService.addLike(id, userId);
+//            return ResponseEntity.ok().build();
+//        } catch (NotFoundException e) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+//        }
+//    }
+//    @DeleteMapping("/{id}/like/{userId}")
+//    public ResponseEntity<?> removeLike(@PathVariable int id, @PathVariable int userId) {
+//        try {
+//            filmService.removeLike(id, userId);
+//            return ResponseEntity.noContent().build();
+//        } catch (NotFoundException e) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Произошла непредвиденная ошибка на сервере"));
+//        }
+//    }
 
     @GetMapping("/popular")
     public ResponseEntity<List<Film>> getPopularFilms(@RequestParam(defaultValue = "10") int count) {
