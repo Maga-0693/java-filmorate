@@ -9,7 +9,9 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/users")
@@ -23,69 +25,76 @@ public class UserController {
     }
 
     @PostMapping
-    public User createUser(@Valid @RequestBody User user) {
-
-        return userService.createUser(user);
+    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
+        User createdUser = userService.createUser(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
     }
 
     @PutMapping
     public ResponseEntity<User> updateUser(@Valid @RequestBody User user) {
         try {
             User updatedUser = userService.updateUser(user);
-            return ResponseEntity.ok(updatedUser);
+            return ResponseEntity.ok(updatedUser);  // 200 OK с полным объектом пользователя
         } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            return ResponseEntity.notFound().build();  // 404 если пользователь не найден
         }
     }
 
     @GetMapping
-    public List<User> getAllUsers() {
-
-        return userService.getAllUsers();
+    public ResponseEntity<List<User>> getAllUsers() {
+        return ResponseEntity.ok(userService.getAllUsers());
     }
 
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable int id) {
-
-        return userService.getUserById(id);
+    public ResponseEntity<?> getUserById(@PathVariable int id) {
+        try {
+            return ResponseEntity.ok(userService.getUserById(id));
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
+        }
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public void addFriend(@PathVariable int id, @PathVariable int friendId) {
-
-        userService.addFriend(id, friendId);
+    public ResponseEntity<?> addFriend(@PathVariable int id, @PathVariable int friendId) {
+        try {
+            userService.addFriend(id, friendId);
+            return ResponseEntity.ok().build();  // 200 OK
+        } catch (NotFoundException e) {
+            return ResponseEntity.notFound().build();  // 404 если пользователь не найден
+        }
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public void removeFriend(@PathVariable int id, @PathVariable int friendId) {
-        userService.removeFriend(id, friendId);
-    }
-
-    @PutMapping("/{id}/friends/{friendId}/confirm")
-    public void confirmFriendship(@PathVariable int id, @PathVariable int friendId) {
-        userService.confirmFriendship(id, friendId);
+    public ResponseEntity<?> removeFriend(@PathVariable int id, @PathVariable int friendId) {
+        try {
+            userService.removeFriend(id, friendId);
+            return ResponseEntity.ok().build();
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
+        }
     }
 
     @GetMapping("/{id}/friends")
-    public List<User> getFriends(@PathVariable int id) {
-
-        return userService.getFriends(id);
-    }
-
-    @GetMapping("/{id}/friends/confirmed")
-    public List<User> getConfirmedFriends(@PathVariable int id) {
-
-        return userService.getConfirmedFriends(id);
-    }
-
-    @GetMapping("/{id}/friends/requests")
-    public List<User> getFriendshipRequests(@PathVariable int id) {
-
-        return userService.getFriendshipRequests(id);
+    public ResponseEntity<?> getFriends(@PathVariable int id) {
+        try {
+            return ResponseEntity.ok(userService.getFriends(id));
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
+        }
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public List<User> getCommonFriends(@PathVariable int id, @PathVariable int otherId) {
-        return userService.getCommonFriends(id, otherId);
+    public ResponseEntity<?> getCommonFriends(
+            @PathVariable int id,
+            @PathVariable int otherId) {
+        try {
+            return ResponseEntity.ok(userService.getCommonFriends(id, otherId));
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("error", e.getMessage()));
+        }
     }
 }

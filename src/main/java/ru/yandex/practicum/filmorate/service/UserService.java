@@ -2,7 +2,9 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.FriendStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
@@ -42,15 +44,41 @@ public class UserService {
         return getUserByIdOrThrow(id);
     }
 
+    @Transactional
     public void addFriend(int userId, int friendId) {
-        User user = getUserByIdOrThrow(userId);
-        User friend = getUserByIdOrThrow(friendId);
+        // Получаем пользователей с полной информацией о друзьях
+        User user = getUserByIdWithFriends(userId);
+        User friend = getUserByIdWithFriends(friendId);
 
-        if (friendStorage.hasFriendshipRequest(friendId, userId)) {
+        // Проверяем, не пытается ли пользователь добавить сам себя
+        if (userId == friendId) {
+            throw new ValidationException("Пользователь не может добавить сам себя в друзья");
+        }
+
+        // Проверяем существование дружбы
+        if (user.getFriends().containsKey(friendId)) {
+            throw new ValidationException("Эти пользователи уже дружат");
+        }
+
+        // Добавляем дружбу
+        if (friend.getFriends().containsKey(userId)) {
+            // Если есть встречный запрос - подтверждаем дружбу
             friendStorage.confirmFriendship(userId, friendId);
         } else {
+            // Иначе создаем новый запрос
             friendStorage.addFriend(userId, friendId, User.FriendshipStatus.UNCONFIRMED);
         }
+    }
+
+    private User getUserByIdWithFriends(int userId) {
+        User user = userStorage.getUserById(userId)
+                .orElseThrow(() -> new NotFoundException("Пользователь с id " + userId + " не найден"));
+
+        // Загружаем информацию о друзьях
+        Map<Integer, User.FriendshipStatus> friends = friendStorage.getFriendsWithStatus(userId);
+        user.setFriends(new HashMap<>(friends));
+
+        return user;
     }
 
     public void removeFriend(int userId, int friendId) {

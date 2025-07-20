@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -61,8 +62,21 @@ public class UserDbStorage implements UserStorage {
     @Override
     public Optional<User> getUserById(int id) {
         String sql = "SELECT * FROM users WHERE user_id = ?";
-        List<User> users = jdbcTemplate.query(sql, this::mapRowToUser, id);
-        return users.isEmpty() ? Optional.empty() : Optional.of(users.get(0));
+        try {
+            User user = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
+                User u = new User();
+                u.setId(rs.getInt("user_id"));
+                u.setEmail(rs.getString("email"));
+                u.setLogin(rs.getString("login"));
+                u.setName(rs.getString("user_name"));
+                u.setBirthday(rs.getDate("birthday").toLocalDate());
+                return u;
+            }, id);
+
+            return Optional.ofNullable(user);
+        } catch (EmptyResultDataAccessException e) {
+            return Optional.empty();
+        }
     }
 
     private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {

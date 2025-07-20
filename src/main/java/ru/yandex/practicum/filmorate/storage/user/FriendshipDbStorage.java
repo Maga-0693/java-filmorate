@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.storage.user;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.User.FriendshipStatus;
 
@@ -21,15 +22,11 @@ public class FriendshipDbStorage implements FriendStorage {
 
     @Override
     public void addFriend(int userId, int friendId, FriendshipStatus status) {
-        String checkSql = "SELECT COUNT(*) FROM friends WHERE user_id = ? AND friend_id = ?";
-        Integer count = jdbcTemplate.queryForObject(checkSql, Integer.class, userId, friendId);
-
-        if (count != null && count > 0) {
-            String updateSql = "UPDATE friends SET status = ? WHERE user_id = ? AND friend_id = ?";
-            jdbcTemplate.update(updateSql, status.name(), userId, friendId);
-        } else {
-            String insertSql = "INSERT INTO friends (user_id, friend_id, status) VALUES (?, ?, ?)";
-            jdbcTemplate.update(insertSql, userId, friendId, status.name());
+        String sql = "INSERT INTO friends (user_id, friend_id, status) VALUES (?, ?, ?)";
+        try {
+            jdbcTemplate.update(sql, userId, friendId, status.toString());
+        } catch (Exception e) {
+            throw new ValidationException("Не удалось добавить друга: " + e.getMessage());
         }
     }
 
@@ -41,26 +38,13 @@ public class FriendshipDbStorage implements FriendStorage {
 
     @Override
     public void confirmFriendship(int userId, int friendId) {
-        String checkRequestSql = "SELECT COUNT(*) FROM friends WHERE user_id = ? AND friend_id = ? AND status = 'UNCONFIRMED'";
-        Integer requestCount = jdbcTemplate.queryForObject(checkRequestSql, Integer.class, friendId, userId);
-
-        if (requestCount == null || requestCount == 0) {
-            throw new IllegalArgumentException("Запрос на дружбу от пользователя не найден " + friendId + " пользователь " + userId);
-        }
-
+        // Обновляем существующий запрос
         String updateSql = "UPDATE friends SET status = 'CONFIRMED' WHERE user_id = ? AND friend_id = ?";
         jdbcTemplate.update(updateSql, friendId, userId);
 
-        String checkFriendshipSql = "SELECT COUNT(*) FROM friends WHERE user_id = ? AND friend_id = ?";
-        Integer friendshipCount = jdbcTemplate.queryForObject(checkFriendshipSql, Integer.class, userId, friendId);
-
-        if (friendshipCount == null || friendshipCount == 0) {
-            String insertSql = "INSERT INTO friends (user_id, friend_id, status) VALUES (?, ?, 'CONFIRMED')";
-            jdbcTemplate.update(insertSql, userId, friendId);
-        } else {
-            String updateReverseSql = "UPDATE friends SET status = 'CONFIRMED' WHERE user_id = ? AND friend_id = ?";
-            jdbcTemplate.update(updateReverseSql, userId, friendId);
-        }
+        // Добавляем обратную связь
+        String insertSql = "INSERT INTO friends (user_id, friend_id, status) VALUES (?, ?, 'CONFIRMED')";
+        jdbcTemplate.update(insertSql, userId, friendId);
     }
 
     @Override
@@ -89,14 +73,20 @@ public class FriendshipDbStorage implements FriendStorage {
     @Override
     public Map<Integer, FriendshipStatus> getFriendsWithStatus(int userId) {
         String sql = "SELECT friend_id, status FROM friends WHERE user_id = ?";
-        return jdbcTemplate.query(sql, rs -> {
-            Map<Integer, FriendshipStatus> result = new HashMap<>();
-            while (rs.next()) {
-                result.put(rs.getInt("friend_id"),
-                        FriendshipStatus.valueOf(rs.getString("status")));
-            }
-            return result;
-        }, userId);
+        try {
+            return jdbcTemplate.query(sql, rs -> {
+                Map<Integer, FriendshipStatus> result = new HashMap<>();
+                while (rs.next()) {
+                    result.put(
+                            rs.getInt("friend_id"),
+                            FriendshipStatus.valueOf(rs.getString("status"))
+                    );
+                }
+                return result;
+            }, userId);
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка при получении списка друзей", e);
+        }
     }
 
     @Override
