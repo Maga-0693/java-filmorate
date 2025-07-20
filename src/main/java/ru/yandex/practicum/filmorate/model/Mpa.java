@@ -15,6 +15,7 @@ public class Mpa {
         this.name = mpa_name;
         this.description = description;
     }
+
     public Mpa(Integer id) {
         this.id = id;
         this.name = "";
@@ -22,10 +23,12 @@ public class Mpa {
     }
 
     public int getId() {
+
         return id;
     }
 
     public String getName() {
+
         return name;
     }
 }

@@ -33,10 +33,12 @@ public class UserService {
     }
 
     public List<User> getAllUsers() {
+
         return userStorage.getAllUsers();
     }
 
     public User getUserById(int id) {
+
         return getUserByIdOrThrow(id);
     }
 

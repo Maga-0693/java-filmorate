@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
-
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.util.List;
@@ -38,13 +37,13 @@ public class FilmDbStorage implements FilmStorage {
             stmt.setString(2, film.getDescription());
             stmt.setDate(3, java.sql.Date.valueOf(film.getReleaseDate()));
             stmt.setInt(4, film.getDuration());
-            stmt.setInt(5, film.getMpa().getId());  // Ошибка 1: предполагается, что Mpa не null
+            stmt.setInt(5, film.getMpa().getId());
             return stmt;
         }, keyHolder);
         film.setId(Objects.requireNonNull(keyHolder.getKey()).intValue());
         if (film.getGenres() != null) {
             film.getGenres().forEach(genre ->
-                    filmGenreDbStorage.addGenreToFilm(film.getId(), genre.getId()));  // Ошибка 2: предполагается, что Genre не null
+                    filmGenreDbStorage.addGenreToFilm(film.getId(), genre.getId()));
         }
         return film;
     }
@@ -58,12 +57,12 @@ public class FilmDbStorage implements FilmStorage {
                 film.getDescription(),
                 java.sql.Date.valueOf(film.getReleaseDate()),
                 film.getDuration(),
-                film.getMpa().getId(),  // Ошибка 3: предполагается, что Mpa не null
+                film.getMpa().getId(),
                 film.getId());
         filmGenreDbStorage.removeGenresFromFilm(film.getId());
         if (film.getGenres() != null) {
             film.getGenres().forEach(genre ->
-                    filmGenreDbStorage.addGenreToFilm(film.getId(), genre.getId()));  // Ошибка 4: предполагается, что Genre не null
+                    filmGenreDbStorage.addGenreToFilm(film.getId(), genre.getId()));
         }
         return film;
     }

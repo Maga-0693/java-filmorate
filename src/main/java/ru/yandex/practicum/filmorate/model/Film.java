@@ -69,26 +69,32 @@ public class Film {
     }
 
     public void setReleaseDate(LocalDate releaseDate) {
+
         this.releaseDate = releaseDate;
     }
 
     public int getDuration() {
+
         return duration;
     }
 
     public void setDuration(int duration) {
+
         this.duration = duration;
     }
 
     public Mpa getMpa() {
+
         return mpa;
     }
 
     public void setMpa(Mpa mpa) {
+
         this.mpa = mpa;
     }
 
     public Set<Genre> getGenres() {
+
         return genres;
     }
 

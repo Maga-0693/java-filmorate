@@ -38,13 +38,10 @@ class UserDbStorageTest {
 
     @Test
     void shouldCreateAndRetrieveUser() {
-        // Создание пользователя
         User createdUser = userStorage.createUser(testUser);
 
-        // Получение пользователя
         Optional<User> retrievedUser = userStorage.getUserById(createdUser.getId());
 
-        // Проверки
         assertThat(retrievedUser)
                 .isPresent()
                 .hasValueSatisfying(user -> {
@@ -56,13 +53,11 @@ class UserDbStorageTest {
 
     @Test
     void shouldUpdateUser() {
-        // Создание и обновление пользователя
         User createdUser = userStorage.createUser(testUser);
         createdUser.setName("Updated Name");
 
         User updatedUser = userStorage.updateUser(createdUser);
 
-        // Проверки
         assertThat(updatedUser.getName()).isEqualTo("Updated Name");
 
         Optional<User> retrievedUser = userStorage.getUserById(createdUser.getId());
@@ -75,7 +70,6 @@ class UserDbStorageTest {
 
     @Test
     void shouldGetAllUsers() {
-        // Создание тестовых данных
         userStorage.createUser(testUser);
         User anotherUser = new User();
         anotherUser.setEmail("another@example.com");
@@ -83,10 +77,8 @@ class UserDbStorageTest {
         anotherUser.setBirthday(LocalDate.of(1995, 5, 15));
         userStorage.createUser(anotherUser);
 
-        // Получение всех пользователей
         List<User> users = userStorage.getAllUsers();
 
-        // Проверки
         assertThat(users)
                 .hasSize(2)
                 .extracting(User::getLogin)
@@ -95,7 +87,6 @@ class UserDbStorageTest {
 
     @Test
     void shouldManageFriendships() {
-        // Создание пользователей
         User user1 = userStorage.createUser(testUser);
 
         User user2 = new User();
@@ -104,17 +95,13 @@ class UserDbStorageTest {
         user2.setBirthday(LocalDate.of(1992, 3, 10));
         user2 = userStorage.createUser(user2);
 
-        // Добавление в друзья
         friendshipStorage.addFriend(user1.getId(), user2.getId(), FriendshipStatus.UNCONFIRMED);
 
-        // Проверка добавления
         Map<Integer, FriendshipStatus> friends = friendshipStorage.getFriendsWithStatus(user1.getId());
         assertThat(friends).containsEntry(user2.getId(), FriendshipStatus.UNCONFIRMED);
 
-        // Удаление из друзей
         friendshipStorage.removeFriend(user1.getId(), user2.getId());
 
-        // Проверка удаления
         Map<Integer, FriendshipStatus> updatedFriends = friendshipStorage.getFriendsWithStatus(user1.getId());
         assertThat(updatedFriends).doesNotContainKey(user2.getId());
     }
@@ -127,7 +114,6 @@ class UserDbStorageTest {
 
     @Test
     void shouldConfirmFriendship() {
-        // Создание пользователей
         User user1 = userStorage.createUser(testUser);
 
         User user2 = new User();
@@ -136,13 +122,10 @@ class UserDbStorageTest {
         user2.setBirthday(LocalDate.of(1992, 3, 10));
         user2 = userStorage.createUser(user2);
 
-        // Отправка запроса на дружбу
         friendshipStorage.addFriend(user1.getId(), user2.getId(), FriendshipStatus.UNCONFIRMED);
 
-        // Подтверждение дружбы
         friendshipStorage.confirmFriendship(user2.getId(), user1.getId());
 
-        // Проверка статуса
         Map<Integer, FriendshipStatus> friendships = friendshipStorage.getFriendsWithStatus(user1.getId());
         assertThat(friendships.get(user2.getId())).isEqualTo(FriendshipStatus.CONFIRMED);
     }

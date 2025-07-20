@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.controller;
 
 import ch.qos.logback.classic.Logger;
 import jakarta.validation.Valid;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,7 +15,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/films")
-//@Slf4j
 public class FilmController {
 
     private static final String LIKE_PATH = "/{id}/like/{userId}";

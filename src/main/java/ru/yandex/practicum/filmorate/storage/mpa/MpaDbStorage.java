@@ -6,7 +6,6 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,6 +34,7 @@ public class MpaDbStorage implements MpaStorage {
             return Optional.empty();
         }
     }
+
     private Mpa mapRowToMpa(ResultSet rs) throws SQLException {
         return new Mpa(
                 rs.getInt("mpa_id"),

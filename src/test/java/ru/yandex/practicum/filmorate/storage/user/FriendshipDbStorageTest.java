@@ -57,32 +57,25 @@ class FriendshipDbStorageTest {
 
     @Test
     void shouldAddAndRemoveFriend() {
-        // Добавление друга
         friendshipStorage.addFriend(user1.getId(), user2.getId(), FriendshipStatus.UNCONFIRMED);
 
-        // Проверка добавления
         Map<Integer, FriendshipStatus> friends = friendshipStorage.getFriendsWithStatus(user1.getId());
         assertThat(friends)
                 .hasSize(1)
                 .containsEntry(user2.getId(), FriendshipStatus.UNCONFIRMED);
 
-        // Удаление друга
         friendshipStorage.removeFriend(user1.getId(), user2.getId());
 
-        // Проверка удаления
         friends = friendshipStorage.getFriendsWithStatus(user1.getId());
         assertThat(friends).isEmpty();
     }
 
     @Test
     void shouldConfirmFriendship() {
-        // Отправка запроса на дружбу
         friendshipStorage.addFriend(user1.getId(), user2.getId(), FriendshipStatus.UNCONFIRMED);
 
-        // Подтверждение дружбы
         friendshipStorage.confirmFriendship(user2.getId(), user1.getId());
 
-        // Проверка статусов
         Map<Integer, FriendshipStatus> user1Friends = friendshipStorage.getFriendsWithStatus(user1.getId());
         Map<Integer, FriendshipStatus> user2Friends = friendshipStorage.getFriendsWithStatus(user2.getId());
 
@@ -99,13 +92,11 @@ class FriendshipDbStorageTest {
     void shouldUpdateFriendshipStatus() {
         friendshipStorage.addFriend(user1.getId(), user2.getId(), FriendshipStatus.UNCONFIRMED);
 
-        // Обновление статуса
         friendshipStorage.updateFriendshipStatus(
                 user1.getId(),
                 user2.getId(),
                 FriendshipStatus.CONFIRMED);
 
-        // Проверка обновления
         Map<Integer, FriendshipStatus> friends = friendshipStorage.getFriendsWithStatus(user1.getId());
         assertThat(friends)
                 .hasSize(1)
@@ -138,7 +129,6 @@ class FriendshipDbStorageTest {
 
     @Test
     void shouldGetCommonFriends() {
-        // Создаем общего друга
         User commonFriend = new User();
         commonFriend.setEmail("common@example.com");
         commonFriend.setLogin("common");
@@ -146,14 +136,11 @@ class FriendshipDbStorageTest {
         commonFriend.setBirthday(LocalDate.of(1998, 5, 15));
         commonFriend = userStorage.createUser(commonFriend);
 
-        // Добавляем друзей
         friendshipStorage.addFriend(user1.getId(), commonFriend.getId(), FriendshipStatus.CONFIRMED);
         friendshipStorage.addFriend(user2.getId(), commonFriend.getId(), FriendshipStatus.CONFIRMED);
 
-        // Получаем общих друзей
         List<User> commonFriends = friendshipStorage.getCommonFriends(user1.getId(), user2.getId());
 
-        // Проверяем результат
         assertThat(commonFriends)
                 .hasSize(1)
                 .extracting(User::getId)

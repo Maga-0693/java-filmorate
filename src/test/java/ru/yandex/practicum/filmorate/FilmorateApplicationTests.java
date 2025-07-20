@@ -26,7 +26,6 @@ public class FilmorateApplicationTests {
 
 	@Test
 	public void testFindUserById() {
-		// Создаем пользователя через конструктор и сеттеры
 		User testUser = new User();
 		testUser.setEmail("test@example.com");
 		testUser.setLogin("testLogin");
