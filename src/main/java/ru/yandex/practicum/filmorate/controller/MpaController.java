@@ -18,6 +18,7 @@ public class MpaController {
 
     @GetMapping
     public List<Mpa> getAllMpaRatings() {
+
         return mpaService.getAllMpa();
     }
 

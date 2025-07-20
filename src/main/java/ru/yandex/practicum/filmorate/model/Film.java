@@ -103,14 +103,17 @@ public class Film {
     }
 
     public void setGenres(Set<Genre> genres) {
+
         this.genres = genres;
     }
 
     public Set<Integer> getLikes() {
+
         return likes;
     }
 
     public void setLikes(Set<Integer> likes) {
+
         this.likes = likes;
     }
 

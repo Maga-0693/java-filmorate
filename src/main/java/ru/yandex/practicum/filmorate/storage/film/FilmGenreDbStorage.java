@@ -36,9 +36,9 @@ public class FilmGenreDbStorage {
             String sql = "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)";
 
             jdbcTemplate.batchUpdate(sql, genreIds, genreIds.size(),
-                    (ps, genreId) -> {
-                        ps.setInt(1, filmId);
-                        ps.setInt(2, genreId);
+                    (preparedStatement, genreId) -> {
+                        preparedStatement.setInt(1, filmId);
+                        preparedStatement.setInt(2, genreId);
                     });
         }
     }

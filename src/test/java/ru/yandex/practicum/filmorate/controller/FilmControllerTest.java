@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-//import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import jakarta.validation.ConstraintViolation;
@@ -94,7 +93,6 @@ public class FilmControllerTest {
 
         assertFalse(violations.isEmpty(), "Должна быть ошибка валидации при null MPA");
 
-        // Проверяем конкретное сообщение об ошибке
         boolean hasMpaError = violations.stream()
                 .anyMatch(v -> v.getPropertyPath().toString().equals("mpa"));
         assertTrue(hasMpaError, "Ожидалась ошибка валидации для поля mpa");

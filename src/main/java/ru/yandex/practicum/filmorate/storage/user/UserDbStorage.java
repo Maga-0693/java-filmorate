@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -18,7 +17,6 @@ import java.util.Optional;
 public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
 
-    @Autowired
     public UserDbStorage(JdbcTemplate jdbcTemplate) {
 
         this.jdbcTemplate = jdbcTemplate;
@@ -30,12 +28,12 @@ public class UserDbStorage implements UserStorage {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
-            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-            ps.setString(1, user.getEmail());
-            ps.setString(2, user.getLogin());
-            ps.setString(3, user.getName());
-            ps.setDate(4, Date.valueOf(user.getBirthday()));
-            return ps;
+            PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.setString(1, user.getEmail());
+            preparedStatement.setString(2, user.getLogin());
+            preparedStatement.setString(3, user.getName());
+            preparedStatement.setDate(4, Date.valueOf(user.getBirthday()));
+            return preparedStatement;
         }, keyHolder);
 
         user.setId(Objects.requireNonNull(keyHolder.getKey()).intValue());
@@ -67,13 +65,13 @@ public class UserDbStorage implements UserStorage {
         return users.isEmpty() ? Optional.empty() : Optional.of(users.get(0));
     }
 
-    private User mapRowToUser(ResultSet rs, int rowNum) throws SQLException {
+    private User mapRowToUser(ResultSet resultSet, int rowNum) throws SQLException {
         User user = new User();
-        user.setId(rs.getInt("user_id"));
-        user.setEmail(rs.getString("email"));
-        user.setLogin(rs.getString("login"));
-        user.setName(rs.getString("user_name"));
-        user.setBirthday(rs.getDate("birthday").toLocalDate());
+        user.setId(resultSet.getInt("user_id"));
+        user.setEmail(resultSet.getString("email"));
+        user.setLogin(resultSet.getString("login"));
+        user.setName(resultSet.getString("user_name"));
+        user.setBirthday(resultSet.getDate("birthday").toLocalDate());
         return user;
     }
 }

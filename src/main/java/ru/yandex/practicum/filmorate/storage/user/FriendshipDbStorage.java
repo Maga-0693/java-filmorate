@@ -21,16 +21,13 @@ public class FriendshipDbStorage implements FriendStorage {
 
     @Override
     public void addFriend(int userId, int friendId, FriendshipStatus status) {
-        // Сначала проверяем существование записи
         String checkSql = "SELECT COUNT(*) FROM friends WHERE user_id = ? AND friend_id = ?";
         Integer count = jdbcTemplate.queryForObject(checkSql, Integer.class, userId, friendId);
 
         if (count != null && count > 0) {
-            // Если запись существует - обновляем статус
             String updateSql = "UPDATE friends SET status = ? WHERE user_id = ? AND friend_id = ?";
             jdbcTemplate.update(updateSql, status.name(), userId, friendId);
         } else {
-            // Если записи нет - вставляем новую
             String insertSql = "INSERT INTO friends (user_id, friend_id, status) VALUES (?, ?, ?)";
             jdbcTemplate.update(insertSql, userId, friendId, status.name());
         }
@@ -44,19 +41,16 @@ public class FriendshipDbStorage implements FriendStorage {
 
     @Override
     public void confirmFriendship(int userId, int friendId) {
-        // 1. Проверяем, что существует запрос дружбы от friendId к userId
         String checkRequestSql = "SELECT COUNT(*) FROM friends WHERE user_id = ? AND friend_id = ? AND status = 'UNCONFIRMED'";
         Integer requestCount = jdbcTemplate.queryForObject(checkRequestSql, Integer.class, friendId, userId);
 
         if (requestCount == null || requestCount == 0) {
-            throw new IllegalArgumentException("No friendship request found from user " + friendId + " to user " + userId);
+            throw new IllegalArgumentException("Запрос на дружбу от пользователя не найден " + friendId + " пользователь " + userId);
         }
 
-        // 2. Обновляем статус существующей записи (от friendId к userId)
         String updateSql = "UPDATE friends SET status = 'CONFIRMED' WHERE user_id = ? AND friend_id = ?";
         jdbcTemplate.update(updateSql, friendId, userId);
 
-        // 3. Добавляем обратную запись (от userId к friendId), если ее нет
         String checkFriendshipSql = "SELECT COUNT(*) FROM friends WHERE user_id = ? AND friend_id = ?";
         Integer friendshipCount = jdbcTemplate.queryForObject(checkFriendshipSql, Integer.class, userId, friendId);
 
@@ -75,7 +69,7 @@ public class FriendshipDbStorage implements FriendStorage {
         int updated = jdbcTemplate.update(sql, status.toString(), userId, friendId);
 
         if (updated == 0) {
-            throw new IllegalArgumentException("Friendship relation not found");
+            throw new IllegalArgumentException("Друзья не найдены");
         }
     }
 
@@ -134,13 +128,13 @@ public class FriendshipDbStorage implements FriendStorage {
 
     private static class UserRowMapper implements RowMapper<User> {
         @Override
-        public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+        public User mapRow(ResultSet resultSet, int rowNum) throws SQLException {
             User user = new User();
-            user.setId(rs.getInt("user_id"));
-            user.setEmail(rs.getString("email"));
-            user.setLogin(rs.getString("login"));
-            user.setName(rs.getString("user_name"));
-            user.setBirthday(rs.getDate("birthday").toLocalDate());
+            user.setId(resultSet.getInt("user_id"));
+            user.setEmail(resultSet.getString("email"));
+            user.setLogin(resultSet.getString("login"));
+            user.setName(resultSet.getString("user_name"));
+            user.setBirthday(resultSet.getDate("birthday").toLocalDate());
             return user;
         }
     }

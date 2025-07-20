@@ -73,18 +73,18 @@ public class FilmDbStorage implements FilmStorage {
         String sql = "SELECT f.*, m.mpa_name, m.description AS mpa_description " +
                 "FROM films f JOIN mpa_ratings m ON f.mpa_id = m.mpa_id"; // Исправлено mpa на mpa_ratings
 
-        return jdbcTemplate.query(sql, (rs, rowNum) -> {
+        return jdbcTemplate.query(sql, (resultSet, rowNum) -> {
             Film film = new Film();
-            film.setId(rs.getInt("film_id"));
-            film.setName(rs.getString("name"));
-            film.setDescription(rs.getString("description"));
-            film.setReleaseDate(rs.getDate("release_date").toLocalDate());
-            film.setDuration(rs.getInt("duration"));
+            film.setId(resultSet.getInt("film_id"));
+            film.setName(resultSet.getString("name"));
+            film.setDescription(resultSet.getString("description"));
+            film.setReleaseDate(resultSet.getDate("release_date").toLocalDate());
+            film.setDuration(resultSet.getInt("duration"));
 
             Mpa mpa = new Mpa(
-                    rs.getInt("mpa_id"),
-                    rs.getString("mpa_name"),
-                    rs.getString("mpa_description")
+                    resultSet.getInt("mpa_id"),
+                    resultSet.getString("mpa_name"),
+                    resultSet.getString("mpa_description")
             );
             film.setMpa(mpa);
 
@@ -98,18 +98,18 @@ public class FilmDbStorage implements FilmStorage {
                 "FROM films f JOIN mpa_ratings m ON f.mpa_id = m.mpa_id WHERE f.film_id = ?";
 
         try {
-            return jdbcTemplate.queryForObject(sql, (rs, rowNum) -> {
+            return jdbcTemplate.queryForObject(sql, (resultSet, rowNum) -> {
                 Film film = new Film();
-                film.setId(rs.getInt("film_id"));  // Используем film_id вместо id
-                film.setName(rs.getString("name"));
-                film.setDescription(rs.getString("description"));
-                film.setReleaseDate(rs.getDate("release_date").toLocalDate());
-                film.setDuration(rs.getInt("duration"));
+                film.setId(resultSet.getInt("film_id"));  // Используем film_id вместо id
+                film.setName(resultSet.getString("name"));
+                film.setDescription(resultSet.getString("description"));
+                film.setReleaseDate(resultSet.getDate("release_date").toLocalDate());
+                film.setDuration(resultSet.getInt("duration"));
 
                 Mpa mpa = new Mpa(
-                        rs.getInt("mpa_id"),
-                        rs.getString("mpa_name"),
-                        rs.getString("mpa_description")
+                        resultSet.getInt("mpa_id"),
+                        resultSet.getString("mpa_name"),
+                        resultSet.getString("mpa_description")
                 );
                 film.setMpa(mpa);
 

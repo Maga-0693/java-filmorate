@@ -74,19 +74,15 @@ class FriendshipDbStorageTest {
 
     @Test
     void shouldConfirmFriendship() {
-        // 1. User1 отправляет запрос дружбы User2
         friendshipStorage.addFriend(user1.getId(), user2.getId(), FriendshipStatus.UNCONFIRMED);
 
-        // 2. User2 подтверждает дружбу с User1
         friendshipStorage.confirmFriendship(user2.getId(), user1.getId());
 
-        // 3. Проверяем друзей User1
         Map<Integer, FriendshipStatus> user1Friends = friendshipStorage.getFriendsWithStatus(user1.getId());
         assertThat(user1Friends)
                 .hasSize(1)
                 .containsEntry(user2.getId(), FriendshipStatus.CONFIRMED);
 
-        // 4. Проверяем друзей User2
         Map<Integer, FriendshipStatus> user2Friends = friendshipStorage.getFriendsWithStatus(user2.getId());
         assertThat(user2Friends)
                 .hasSize(1)

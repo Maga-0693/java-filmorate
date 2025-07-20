@@ -21,25 +21,25 @@ public class MpaDbStorage implements MpaStorage {
     @Override
     public List<Mpa> getAllMpa() {
         String sql = "SELECT * FROM mpa_ratings ORDER BY mpa_id";
-        return jdbcTemplate.query(sql, (rs, rowNum) -> mapRowToMpa(rs));
+        return jdbcTemplate.query(sql, (resultSet, rowNum) -> mapRowToMpa(resultSet));
     }
 
     @Override
     public Optional<Mpa> getMpaById(int id) {
         String sql = "SELECT * FROM mpa_ratings WHERE mpa_id = ?";
         try {
-            Mpa mpa = jdbcTemplate.queryForObject(sql, (rs, rowNum) -> mapRowToMpa(rs), id);
+            Mpa mpa = jdbcTemplate.queryForObject(sql, (resultSet, rowNum) -> mapRowToMpa(resultSet), id);
             return Optional.ofNullable(mpa);
         } catch (Exception e) {
             return Optional.empty();
         }
     }
 
-    private Mpa mapRowToMpa(ResultSet rs) throws SQLException {
+    private Mpa mapRowToMpa(ResultSet resultSet) throws SQLException {
         return new Mpa(
-                rs.getInt("mpa_id"),
-                rs.getString("mpa_name"),
-                rs.getString("description")
+                resultSet.getInt("mpa_id"),
+                resultSet.getString("mpa_name"),
+                resultSet.getString("description")
         );
     }
 }

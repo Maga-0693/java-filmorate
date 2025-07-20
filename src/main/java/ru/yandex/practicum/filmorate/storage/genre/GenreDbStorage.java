@@ -17,15 +17,15 @@ public class GenreDbStorage implements GenreStorage {
     @Override
     public List<Genre> getAllGenres() {
         String sql = "SELECT * FROM genres ORDER BY genre_id";
-        return jdbcTemplate.query(sql, (rs, rowNum) ->
-                new Genre(rs.getInt("genre_id"), rs.getString("genre_name")));
+        return jdbcTemplate.query(sql, (resultSet, rowNum) ->
+                new Genre(resultSet.getInt("genre_id"), resultSet.getString("genre_name")));
     }
 
     @Override
     public Genre getGenreById(int id) {
         String sql = "SELECT * FROM genres WHERE genre_id = ?";
-        return jdbcTemplate.queryForObject(sql, (rs, rowNum) ->
-                new Genre(rs.getInt("genre_id"), rs.getString("genre_name")), id);
+        return jdbcTemplate.queryForObject(sql, (resultSet, rowNum) ->
+                new Genre(resultSet.getInt("genre_id"), resultSet.getString("genre_name")), id);
     }
 
     @Override
@@ -33,8 +33,8 @@ public class GenreDbStorage implements GenreStorage {
         String sql = "SELECT g.genre_id, g.genre_name FROM film_genres fg " +
                 "JOIN genres g ON fg.genre_id = g.genre_id " +
                 "WHERE fg.film_id = ? ORDER BY g.genre_id";
-        return jdbcTemplate.query(sql, (rs, rowNum) ->
-                new Genre(rs.getInt("genre_id"), rs.getString("genre_name")), filmId);
+        return jdbcTemplate.query(sql, (resultSet, rowNum) ->
+                new Genre(resultSet.getInt("genre_id"), resultSet.getString("genre_name")), filmId);
     }
 
     @Override
