@@ -91,7 +91,7 @@ public class FilmDbStorage implements FilmStorage {
         try {
             return jdbcTemplate.queryForObject(sql, this::mapRowToFilm, id);
         } catch (EmptyResultDataAccessException e) {
-            throw new NotFoundException("Фильм с id " + id + " не найден");
+            return null; // Возвращаем null вместо выбрасывания исключения
         }
     }
 

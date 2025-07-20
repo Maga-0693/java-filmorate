@@ -112,12 +112,12 @@ class FilmDbStorageTest {
     @Test
     void shouldReturnEmptyListWhenNoFilmsExist() {
         Film foundFilm = filmStorage.getFilmById(999);
-        assertThat(foundFilm).isNull();
+        assertThat(foundFilm).isNull(); // Проверяем, что возвращается null
     }
 
     @Test
     void shouldReturnEmptyOptionalWhenFilmNotFound() {
-        Optional<Film> foundFilm = Optional.ofNullable(filmStorage.getFilmById(999));
-        assertThat(foundFilm).isEmpty();
+        Film foundFilm = filmStorage.getFilmById(999);
+        assertThat(foundFilm).isNull(); // Проверяем, что возвращается null
     }
 }
