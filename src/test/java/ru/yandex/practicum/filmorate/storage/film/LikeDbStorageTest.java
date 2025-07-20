@@ -31,29 +31,27 @@ class LikeDbStorageTest {
 
     @Test
     void shouldAddAndRemoveLike() {
-        Film film = Film.builder()
-                .name("Test Film")
-                .description("Test Description")
-                .releaseDate(LocalDate.of(2000, 1, 1))
-                .duration(120)
-                .mpaId(Mpa.builder().id(1).build())
-                .build();
+        Mpa mpa = new Mpa(1);
 
-        User user = User.builder()
-                .email("test@example.com")
-                .login("testLogin")
-                .name("Test User")
-                .birthday(LocalDate.of(1990, 1, 1))
-                .build();
+        Film film = new Film();
+        film.setName("Test Film");
+        film.setDescription("Test Description");
+        film.setReleaseDate(LocalDate.of(2000, 1, 1));
+        film.setDuration(120);
+        film.setMpa(mpa);
+
+        User user = new User();
+        user.setEmail("test@example.com");
+        user.setLogin("testLogin");
+        user.setName("Test User");
+        user.setBirthday(LocalDate.of(1990, 1, 1));
 
         Film createdFilm = filmStorage.addFilm(film);
         User createdUser = userStorage.createUser(user);
 
         likeStorage.addLike(createdFilm.getId(), createdUser.getId());
-
         List<Integer> likes = likeStorage.getLikesByFilmId(createdFilm.getId());
-        assertThat(likes).hasSize(1);
-        assertThat(likes).contains(createdUser.getId());
+        assertThat(likes).containsExactly(createdUser.getId());
 
         likeStorage.removeLike(createdFilm.getId(), createdUser.getId());
         likes = likeStorage.getLikesByFilmId(createdFilm.getId());

@@ -21,15 +21,14 @@ public class FilmControllerTest {
     @BeforeEach
     void setUp() {
         validator = Validation.buildDefaultValidatorFactory().getValidator();
-        film = Film.builder()
-                .name("Название фильма")
-                .description("Описание фильма")
-                .releaseDate(LocalDate.of(2000, 1, 1))
-                .duration(120)
-                .mpaId(new Mpa(1, "G", "General Audiences"))
-                .genres(new HashSet<>())
-                .likes(new HashSet<>())
-                .build();
+        film = new Film();
+        film.setName("Название фильма");
+        film.setDescription("Описание фильма");
+        film.setReleaseDate(LocalDate.of(2000, 1, 1));
+        film.setDuration(120);
+        film.setMpa(new Mpa(1, "G", "General Audiences"));
+        film.setGenres(new HashSet<>());
+        film.setLikes(new HashSet<>());
     }
 
     @Test
@@ -88,7 +87,7 @@ public class FilmControllerTest {
 
     @Test
     void whenMpaIsNull_thenValidationFails() {
-        film.setMpaId(null);
+        film.setMpa(null);
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertFalse(violations.isEmpty());
     }

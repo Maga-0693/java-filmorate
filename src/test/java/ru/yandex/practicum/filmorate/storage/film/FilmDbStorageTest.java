@@ -34,13 +34,12 @@ class FilmDbStorageTest {
 
     @BeforeEach
     void setUp() {
-        testFilm = Film.builder()
-                .name("Test Film")
-                .description("Test Description")
-                .releaseDate(LocalDate.of(2000, 1, 1))
-                .duration(120)
-                .mpaId(new Mpa(1, "G", "General Audiences"))
-                .build();
+        testFilm = new Film();
+        testFilm.setName("Test Film");
+        testFilm.setDescription("Test Description");
+        testFilm.setReleaseDate(LocalDate.of(2000, 1, 1));
+        testFilm.setDuration(120);
+        testFilm.setMpa(new Mpa(1, "G", "General Audiences"));
     }
 
     @Test
@@ -55,7 +54,7 @@ class FilmDbStorageTest {
                     assertThat(film.getId()).isPositive();
                     assertThat(film.getName()).isEqualTo("Test Film");
                     assertThat(film.getDuration()).isEqualTo(120);
-                    assertThat(film.getMpaId().getId()).isEqualTo(1);
+                    assertThat(film.getMpa().getId()).isEqualTo(1);
                 });
     }
 
@@ -75,13 +74,14 @@ class FilmDbStorageTest {
     @Test
     void shouldGetAllFilms() {
         filmStorage.addFilm(testFilm);
-        filmStorage.addFilm(Film.builder()
-                .name("Another Film")
-                .description("Another Description")
-                .releaseDate(LocalDate.of(2001, 1, 1))
-                .duration(90)
-                .mpaId(new Mpa(2, "PG", "Parental Guidance"))
-                .build());
+
+        Film anotherFilm = new Film();
+        anotherFilm.setName("Another Film");
+        anotherFilm.setDescription("Another Description");
+        anotherFilm.setReleaseDate(LocalDate.of(2001, 1, 1));
+        anotherFilm.setDuration(90);
+        anotherFilm.setMpa(new Mpa(2, "PG", "Parental Guidance"));
+        filmStorage.addFilm(anotherFilm);
 
         List<Film> films = filmStorage.getAllFilms();
 

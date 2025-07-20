@@ -8,6 +8,7 @@ import org.springframework.test.context.ActiveProfiles;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,11 +26,12 @@ public class FilmorateApplicationTests {
 
 	@Test
 	public void testFindUserById() {
-		User testUser = User.builder()
-				.email("test@example.com")
-				.login("testLogin")
-				.birthday(java.time.LocalDate.now())
-				.build();
+		// Создаем пользователя через конструктор и сеттеры
+		User testUser = new User();
+		testUser.setEmail("test@example.com");
+		testUser.setLogin("testLogin");
+		testUser.setBirthday(LocalDate.now());
+
 		User createdUser = userStorage.createUser(testUser);
 
 		Optional<User> foundUser = userStorage.getUserById(createdUser.getId());

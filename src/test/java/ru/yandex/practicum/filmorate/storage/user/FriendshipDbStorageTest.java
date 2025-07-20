@@ -33,29 +33,26 @@ class FriendshipDbStorageTest {
 
     @BeforeEach
     void setUp() {
-        user1 = userStorage.createUser(
-                User.builder()
-                        .email("user1@example.com")
-                        .login("user1")
-                        .name("User One")
-                        .birthday(LocalDate.of(1990, 1, 1))
-                        .build());
+        User tempUser1 = new User();
+        tempUser1.setEmail("user1@example.com");
+        tempUser1.setLogin("user1");
+        tempUser1.setName("User One");
+        tempUser1.setBirthday(LocalDate.of(1990, 1, 1));
+        user1 = userStorage.createUser(tempUser1);
 
-        user2 = userStorage.createUser(
-                User.builder()
-                        .email("user2@example.com")
-                        .login("user2")
-                        .name("User Two")
-                        .birthday(LocalDate.of(1995, 1, 1))
-                        .build());
+        User tempUser2 = new User();
+        tempUser2.setEmail("user2@example.com");
+        tempUser2.setLogin("user2");
+        tempUser2.setName("User Two");
+        tempUser2.setBirthday(LocalDate.of(1995, 1, 1));
+        user2 = userStorage.createUser(tempUser2);
 
-        user3 = userStorage.createUser(
-                User.builder()
-                        .email("user3@example.com")
-                        .login("user3")
-                        .name("User Three")
-                        .birthday(LocalDate.of(2000, 1, 1))
-                        .build());
+        User tempUser3 = new User();
+        tempUser3.setEmail("user3@example.com");
+        tempUser3.setLogin("user3");
+        tempUser3.setName("User Three");
+        tempUser3.setBirthday(LocalDate.of(2000, 1, 1));
+        user3 = userStorage.createUser(tempUser3);
     }
 
     @Test
@@ -142,13 +139,12 @@ class FriendshipDbStorageTest {
     @Test
     void shouldGetCommonFriends() {
         // Создаем общего друга
-        User commonFriend = userStorage.createUser(
-                User.builder()
-                        .email("common@example.com")
-                        .login("common")
-                        .name("Common Friend")
-                        .birthday(LocalDate.of(1998, 5, 15))
-                        .build());
+        User commonFriend = new User();
+        commonFriend.setEmail("common@example.com");
+        commonFriend.setLogin("common");
+        commonFriend.setName("Common Friend");
+        commonFriend.setBirthday(LocalDate.of(1998, 5, 15));
+        commonFriend = userStorage.createUser(commonFriend);
 
         // Добавляем друзей
         friendshipStorage.addFriend(user1.getId(), commonFriend.getId(), FriendshipStatus.CONFIRMED);

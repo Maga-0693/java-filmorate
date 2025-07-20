@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import ch.qos.logback.classic.Logger;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +16,14 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/films")
-@Slf4j
+//@Slf4j
 public class FilmController {
 
     private static final String LIKE_PATH = "/{id}/like/{userId}";
     private static final String POPULAR_PATH = "/popular";
 
     private final FilmService filmService;
+    private Logger log;
 
     @Autowired
     public FilmController(FilmService filmService) {

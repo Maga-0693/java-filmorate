@@ -16,6 +16,7 @@ public class FriendshipDbStorage implements FriendStorage {
     private final JdbcTemplate jdbcTemplate;
 
     public FriendshipDbStorage(JdbcTemplate jdbcTemplate) {
+
         this.jdbcTemplate = jdbcTemplate;
     }
 
@@ -103,13 +104,13 @@ public class FriendshipDbStorage implements FriendStorage {
     private static class UserRowMapper implements RowMapper<User> {
         @Override
         public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-            return User.builder()
-                    .id(rs.getInt("user_id"))
-                    .email(rs.getString("email"))
-                    .login(rs.getString("login"))
-                    .name(rs.getString("user_name"))
-                    .birthday(rs.getDate("birthday").toLocalDate())
-                    .build();
+            User user = new User();
+            user.setId(rs.getInt("user_id"));
+            user.setEmail(rs.getString("email"));
+            user.setLogin(rs.getString("login"));
+            user.setName(rs.getString("user_name"));
+            user.setBirthday(rs.getDate("birthday").toLocalDate());
+            return user;
         }
     }
 }

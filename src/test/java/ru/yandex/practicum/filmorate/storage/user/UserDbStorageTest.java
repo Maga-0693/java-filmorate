@@ -29,12 +29,11 @@ class UserDbStorageTest {
 
     @BeforeEach
     void setUp() {
-        testUser = User.builder()
-                .email("test@example.com")
-                .login("testLogin")
-                .name("Test User")
-                .birthday(LocalDate.of(1990, 1, 1))
-                .build();
+        testUser = new User();
+        testUser.setEmail("test@example.com");
+        testUser.setLogin("testLogin");
+        testUser.setName("Test User");
+        testUser.setBirthday(LocalDate.of(1990, 1, 1));
     }
 
     @Test
@@ -78,11 +77,11 @@ class UserDbStorageTest {
     void shouldGetAllUsers() {
         // Создание тестовых данных
         userStorage.createUser(testUser);
-        userStorage.createUser(User.builder()
-                .email("another@example.com")
-                .login("anotherLogin")
-                .birthday(LocalDate.of(1995, 5, 15))
-                .build());
+        User anotherUser = new User();
+        anotherUser.setEmail("another@example.com");
+        anotherUser.setLogin("anotherLogin");
+        anotherUser.setBirthday(LocalDate.of(1995, 5, 15));
+        userStorage.createUser(anotherUser);
 
         // Получение всех пользователей
         List<User> users = userStorage.getAllUsers();
@@ -98,11 +97,12 @@ class UserDbStorageTest {
     void shouldManageFriendships() {
         // Создание пользователей
         User user1 = userStorage.createUser(testUser);
-        User user2 = userStorage.createUser(User.builder()
-                .email("friend@example.com")
-                .login("friendLogin")
-                .birthday(LocalDate.of(1992, 3, 10))
-                .build());
+
+        User user2 = new User();
+        user2.setEmail("friend@example.com");
+        user2.setLogin("friendLogin");
+        user2.setBirthday(LocalDate.of(1992, 3, 10));
+        user2 = userStorage.createUser(user2);
 
         // Добавление в друзья
         friendshipStorage.addFriend(user1.getId(), user2.getId(), FriendshipStatus.UNCONFIRMED);
@@ -129,11 +129,12 @@ class UserDbStorageTest {
     void shouldConfirmFriendship() {
         // Создание пользователей
         User user1 = userStorage.createUser(testUser);
-        User user2 = userStorage.createUser(User.builder()
-                .email("friend@example.com")
-                .login("friendLogin")
-                .birthday(LocalDate.of(1992, 3, 10))
-                .build());
+
+        User user2 = new User();
+        user2.setEmail("friend@example.com");
+        user2.setLogin("friendLogin");
+        user2.setBirthday(LocalDate.of(1992, 3, 10));
+        user2 = userStorage.createUser(user2);
 
         // Отправка запроса на дружбу
         friendshipStorage.addFriend(user1.getId(), user2.getId(), FriendshipStatus.UNCONFIRMED);
