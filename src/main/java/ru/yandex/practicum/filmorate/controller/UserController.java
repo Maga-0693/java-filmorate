@@ -6,9 +6,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,33 +26,44 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
-        User createdUser = userService.createUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+    public ResponseEntity<?> createUser(@Valid @RequestBody User user) {
+        try {
+            User createdUser = userService.createUser(user);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+        } catch (ValidationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Произошла непредвиденная ошибка на сервере"));
+        }
     }
 
     @PutMapping
-    public ResponseEntity<User> updateUser(@Valid @RequestBody User user) {
+    public ResponseEntity<?> updateUser(@Valid @RequestBody User user) {
         try {
             User updatedUser = userService.updateUser(user);
-            return ResponseEntity.ok(updatedUser);  // 200 OK с полным объектом пользователя
+            return ResponseEntity.ok(updatedUser);
         } catch (NotFoundException e) {
-            return ResponseEntity.notFound().build();  // 404 если пользователь не найден
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Произошла непредвиденная ошибка на сервере"));
         }
     }
 
     @GetMapping
     public ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
+        List<User> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable int id) {
         try {
-            return ResponseEntity.ok(userService.getUserById(id));
+            User user = userService.getUserById(id);
+            return ResponseEntity.ok(user);
         } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Произошла непредвиденная ошибка на сервере"));
         }
     }
 
@@ -58,9 +71,17 @@ public class UserController {
     public ResponseEntity<?> addFriend(@PathVariable int id, @PathVariable int friendId) {
         try {
             userService.addFriend(id, friendId);
-            return ResponseEntity.ok().build();  // 200 OK
+            User user1 = userService.getUserById(id);
+            User user2 = userService.getUserById(friendId);
+            Map<String, Object> response = new HashMap<>();
+            response.put("user1", user1);
+            response.put("user2", user2);
+            response.put("message", "Дружба успешно добавлена");
+            return ResponseEntity.ok(response);
         } catch (NotFoundException e) {
-            return ResponseEntity.notFound().build();  // 404 если пользователь не найден
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Произошла непредвиденная ошибка на сервере"));
         }
     }
 
@@ -70,30 +91,33 @@ public class UserController {
             userService.removeFriend(id, friendId);
             return ResponseEntity.ok().build();
         } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Произошла непредвиденная ошибка на сервере"));
         }
     }
 
     @GetMapping("/{id}/friends")
     public ResponseEntity<?> getFriends(@PathVariable int id) {
         try {
-            return ResponseEntity.ok(userService.getFriends(id));
+            List<User> friends = userService.getFriends(id);
+            return ResponseEntity.ok(friends);
         } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Произошла непредвиденная ошибка на сервере"));
         }
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public ResponseEntity<?> getCommonFriends(
-            @PathVariable int id,
-            @PathVariable int otherId) {
+    public ResponseEntity<?> getCommonFriends(@PathVariable int id, @PathVariable int otherId) {
         try {
-            return ResponseEntity.ok(userService.getCommonFriends(id, otherId));
+            List<User> commonFriends = userService.getCommonFriends(id, otherId);
+            return ResponseEntity.ok(commonFriends);
         } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body(Map.of("error", e.getMessage()));
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", e.getMessage()));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error", "Произошла непредвиденная ошибка на сервере"));
         }
     }
 }
