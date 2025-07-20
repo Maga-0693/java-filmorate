@@ -64,7 +64,6 @@ public class UserService {
         User user = userStorage.getUserById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id " + userId + " не найден"));
 
-        // Загружаем информацию о друзьях
         Map<Integer, User.FriendshipStatus> friends = friendStorage.getFriendsWithStatus(userId);
         user.setFriends(new HashMap<>(friends));
 

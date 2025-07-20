@@ -38,11 +38,9 @@ public class FriendshipDbStorage implements FriendStorage {
 
     @Override
     public void confirmFriendship(int userId, int friendId) {
-        // Обновляем существующий запрос
         String updateSql = "UPDATE friends SET status = 'CONFIRMED' WHERE user_id = ? AND friend_id = ?";
         jdbcTemplate.update(updateSql, friendId, userId);
 
-        // Добавляем обратную связь
         String insertSql = "INSERT INTO friends (user_id, friend_id, status) VALUES (?, ?, 'CONFIRMED')";
         jdbcTemplate.update(insertSql, userId, friendId);
     }
