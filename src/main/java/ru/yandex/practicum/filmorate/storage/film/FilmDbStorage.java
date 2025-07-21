@@ -6,13 +6,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -107,7 +105,7 @@ public class FilmDbStorage implements FilmStorage {
         try {
             return jdbcTemplate.queryForObject(sql, this::mapRowToFilm, id);
         } catch (EmptyResultDataAccessException e) {
-            return null; // Возвращаем null вместо выбрасывания исключения
+            return null;
         }
     }
 
