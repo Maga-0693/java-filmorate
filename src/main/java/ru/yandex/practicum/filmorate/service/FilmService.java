@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
-
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
     private final LikeDbStorage likeDbStorage;
@@ -111,12 +110,10 @@ public class FilmService {
         if (film == null) {
             throw new NotFoundException("Фильм с id " + filmId + " не найден");
         }
-
         Optional<User> user = userStorage.getUserById(userId);
         if (user.isEmpty()) {
             throw new NotFoundException("Пользователь с id " + userId + " не найден");
         }
-
         likeDbStorage.addLike(filmId, userId);
     }
 
@@ -125,12 +122,10 @@ public class FilmService {
         if (film == null) {
             throw new NotFoundException("Фильм с id " + filmId + " не найден");
         }
-
         Optional<User> user = userStorage.getUserById(userId);
         if (user.isEmpty()) {
             throw new NotFoundException("Пользователь с id " + userId + " не найден");
         }
-
         likeDbStorage.removeLike(filmId, userId);
     }
 

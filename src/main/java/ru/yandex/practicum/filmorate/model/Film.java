@@ -117,36 +117,6 @@ public class Film {
         this.likes = likes;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        Film film = (Film) o;
-
-        if (id != film.id) return false;
-        if (duration != film.duration) return false;
-        if (!Objects.equals(name, film.name)) return false;
-        if (!Objects.equals(description, film.description)) return false;
-        if (!releaseDate.equals(film.releaseDate)) return false;
-        if (!Objects.equals(mpa, film.mpa)) return false;
-        if (!Objects.equals(genres, film.genres)) return false;
-        return Objects.equals(likes, film.likes);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = id;
-        result = 31 * result + (name != null ? name.hashCode() : 0);
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        result = 31 * result + releaseDate.hashCode();
-        result = 31 * result + duration;
-        result = 31 * result + (mpa != null ? mpa.hashCode() : 0);
-        result = 31 * result + (genres != null ? genres.hashCode() : 0);
-        result = 31 * result + (likes != null ? likes.hashCode() : 0);
-        return result;
-    }
-
     public Film() {
     }
 }

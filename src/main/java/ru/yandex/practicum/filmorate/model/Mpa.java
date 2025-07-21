@@ -17,7 +17,7 @@ public class Mpa {
         this.description = description;
     }
 
-    public Mpa(Integer id) {
+    public Mpa(int id) {
         this.id = id;
         this.name = "";
         this.description = "";
