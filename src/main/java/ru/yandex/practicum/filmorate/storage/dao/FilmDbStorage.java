@@ -3,6 +3,8 @@ package ru.yandex.practicum.filmorate.storage.dao;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import jakarta.validation.constraints.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -36,6 +38,8 @@ public class FilmDbStorage implements FilmStorage {
     private final GenreStorage genreStorage;
     private final LikeStorage likeStorage;
     private final MpaStorage mpaStorage;
+//    private static final Logger film = LoggerFactory.getLogger(FilmDbStorage.class);
+//    private static final Logger log = LoggerFactory.getLogger(FilmDbStorage.class);
 
     private RowMapper<Film> mapToFilm() {
         return new RowMapper<Film>() {

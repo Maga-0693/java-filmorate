@@ -31,6 +31,9 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film addFilm(Film film) {
         validateBody(film);
+        if (film.getMpa() == null) {
+            throw new CustomValidationException("MPA must be specified");
+        }
         film.setId(id);
         films.put(id, film);
         generateId();
