@@ -36,8 +36,6 @@ public class FilmDbStorage implements FilmStorage {
     private final GenreStorage genreStorage;
     private final LikeStorage likeStorage;
     private final MpaStorage mpaStorage;
-//    private static final Logger film = LoggerFactory.getLogger(FilmDbStorage.class);
-//    private static final Logger log = LoggerFactory.getLogger(FilmDbStorage.class);
 
     private RowMapper<Film> mapToFilm() {
         return new RowMapper<Film>() {
