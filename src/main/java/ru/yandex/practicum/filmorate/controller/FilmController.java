@@ -1,77 +1,75 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import java.util.List;
-import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/films")
-@Slf4j
+@AllArgsConstructor
 public class FilmController {
-
-    private static final String LIKE_PATH = "/{id}/like/{userId}";
-    private static final String POPULAR_PATH = "/popular";
 
     private final FilmService filmService;
 
-    @Autowired
-    public FilmController(FilmService filmService) {
-
-        this.filmService = filmService;
+    @GetMapping
+    public List<Film> getFilms() {
+        log.debug("GET request received to receive all films");
+        return filmService.getFilms();
     }
 
     @PostMapping
-    public ResponseEntity<Film> addFilm(@Valid @RequestBody Film film) {
-        log.info("Добавлен фильм: {}", film.getName());
-        Film createdFilm = filmService.addFilm(film);
-        return ResponseEntity.ok(createdFilm);
+    public Film addFilm(@RequestBody Film film) {
+        log.debug("POST request received to create new film");
+        return filmService.addFilm(film);
     }
 
     @PutMapping
-    public ResponseEntity<Film> updateFilm(@Valid @RequestBody Film film) {
-        log.info("Обновлен фильм с id: {}", film.getId());
-        Film updatedFilm = filmService.updateFilm(film);
-        return ResponseEntity.ok(updatedFilm);
+    public Film updateFilm(@RequestBody Film film) {
+        log.debug("PUT request received to update film by given entity");
+        return filmService.updateFilm(film);
     }
 
-    @GetMapping
-    public ResponseEntity<List<Film>> getAllFilms() {
-        List<Film> films = filmService.getAllFilms();
-        return ResponseEntity.ok(films);
+    @PutMapping("/{id}/like/{userId}")
+    public boolean like(@PathVariable(value = "id") Integer id, @PathVariable(value = "userId") Integer userId) {
+        log.debug("PUT request received to add new like to film with id= {} by user with id= {}", id, userId);
+        return filmService.like(id, userId);
     }
 
-    @PutMapping(LIKE_PATH)
-    public ResponseEntity<?> addLike(@PathVariable int id, @PathVariable int userId) {
-        try {
-            filmService.addLike(id, userId);
-            return ResponseEntity.ok().body(Map.of("message", "Лайк успешно добавлен"));
-        } catch (NotFoundException notFoundEx) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", notFoundEx.getMessage()));
-        }
+    @DeleteMapping("/{id}/like/{userId}")
+    public void unLike(@PathVariable(value = "id") Integer id, @PathVariable(value = "userId") Integer userId) {
+        log.debug("PUT request received to add new like to film with id= {} by user with id= {}", id, userId);
+        filmService.unlike(id, userId);
     }
 
-    @DeleteMapping(LIKE_PATH)
-    public ResponseEntity<?> removeLike(@PathVariable int id, @PathVariable int userId) {
-        try {
-            filmService.removeLike(id, userId);
-            return ResponseEntity.ok().body(Map.of("message", "Лайк успешно удален"));
-        } catch (NotFoundException notFoundEx) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of("error", notFoundEx.getMessage()));
-        }
+    @GetMapping("/popular")
+    public List<Film> getTopCountOr10Films(@RequestParam(required = false, defaultValue = "10") Integer count) {
+        log.debug("GET request received to get top 10 films");
+        return filmService.getTopCountOr10Films(count);
     }
 
-    @GetMapping(POPULAR_PATH)
-    public ResponseEntity<List<Film>> getPopularFilms(@RequestParam(defaultValue = "10") int count) {
-        List<Film> popularFilms = filmService.getPopularFilms(count);
-        return ResponseEntity.ok(popularFilms);
+    @GetMapping("/{id}")
+    public Film getFilmById(@PathVariable(value = "id") Integer id) {
+        log.debug("GET request received to get film by given id= {}", id);
+        return filmService.getFilmById(id);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteFilmById(@PathVariable(value = "id") Integer id) {
+        log.debug("DELETE request received to delete film by given id= {}", id);
+        filmService.deleteFilmById(id);
+        return ResponseEntity.ok("Film with ID " + id + " has been successfully deleted");
+    }
+
+    @GetMapping("/{id}/friends")
+    public List<User> getFriendsByFilmId(@PathVariable(value = "id") Integer id) {
+        log.debug("GET request received to get friends by film id= {}", id);
+        return filmService.getFriendsByFilmId(id);
     }
 }
