@@ -1,15 +1,17 @@
-package ru.yandex.practicum.filmorate.validation;
+package ru.yandex.practicum.filmorate.model.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import java.lang.annotation.*;
 
 @Documented
-@Constraint(validatedBy = ReleaseDateValidator.class)
 @Target({ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
+@Constraint(validatedBy = ReleaseDateValidator.class)
 public @interface ReleaseDate {
-    String message() default "Дата релиза не может быть раньше 28 декабря 1895 года";
+    String message() default "Invalid release date. The date should not be before 28 December 1895.";
+
     Class<?>[] groups() default {};
+
     Class<? extends Payload>[] payload() default {};
 }
