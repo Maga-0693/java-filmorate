@@ -12,6 +12,8 @@ import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.GenreService;
+import ru.yandex.practicum.filmorate.service.MpaService;
 import ru.yandex.practicum.filmorate.storage.api.*;
 import ru.yandex.practicum.filmorate.storage.dao.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.dao.GenreDbStorage;
@@ -40,9 +42,11 @@ public class FilmDbStorageTest {
     @BeforeEach
     void set() {
         GenreStorage genreStorage = new GenreDbStorage(jdbcTemplate);
+        GenreService genreService = new GenreService(genreStorage);
+        MpaService mpaService = new MpaService(mpaStorage);
         filmStorage = new FilmDbStorage(jdbcTemplate, genreStorage, likeStorage, mpaStorage);
 
-        FilmService filmService = new FilmService(filmStorage, likeStorage, userStorage);
+        FilmService filmService = new FilmService(filmStorage, likeStorage, userStorage, genreService, mpaService);
         film = new Film(0, "Film1", "descFilm1", LocalDate.of(2023, 1, 1), 100, 1, Collections.emptyList(), new Mpa(1, "G"));
     }
 

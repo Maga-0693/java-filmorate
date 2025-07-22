@@ -7,7 +7,11 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import ru.yandex.practicum.filmorate.exception.CustomValidationException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.GenreService;
+import ru.yandex.practicum.filmorate.service.MpaService;
 import ru.yandex.practicum.filmorate.storage.api.LikeStorage;
 import ru.yandex.practicum.filmorate.storage.dao.LikeDbStorage;
 import ru.yandex.practicum.filmorate.storage.impl.InMemoryFilmStorage;
@@ -16,6 +20,7 @@ import ru.yandex.practicum.filmorate.storage.api.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.api.UserStorage;
 
 import java.time.LocalDate;
+import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -32,11 +37,13 @@ class FilmControllerTest {
         FilmStorage filmStorage = new InMemoryFilmStorage();
         LikeStorage likeStorage = new LikeDbStorage(jdbcTemplate);
         UserStorage userStorage = new InMemoryUserStorage();
-        FilmService filmService = new FilmService(filmStorage, likeStorage, userStorage);
+        GenreService genreService = new GenreService(null);
+        MpaService mpaService = new MpaService(null);
+        FilmService filmService = new FilmService(filmStorage, likeStorage, userStorage, genreService, mpaService);
         filmController = new FilmController(filmService);
         film = new Film(22, "", "", LocalDate.of(1777, 9, 2),
                 -1, null, null, null);
-        film2 = new Film(1, "Марко Поло", "Драмеди про похождения друзей",
+        film2 = new Film(1, "Марко Поло", "Комедия про похождения друзей",
                 LocalDate.of(2000, 10, 8), 135, null, null, null);
     }
 
