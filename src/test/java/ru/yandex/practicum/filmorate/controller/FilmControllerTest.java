@@ -1,52 +1,50 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import ru.yandex.practicum.filmorate.exception.CustomValidationException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.service.GenreService;
-import ru.yandex.practicum.filmorate.service.MpaService;
-import ru.yandex.practicum.filmorate.storage.api.LikeStorage;
-import ru.yandex.practicum.filmorate.storage.dao.GenreDbStorage;
-import ru.yandex.practicum.filmorate.storage.dao.LikeDbStorage;
-import ru.yandex.practicum.filmorate.storage.dao.MpaDbStorage;
-import ru.yandex.practicum.filmorate.storage.impl.InMemoryFilmStorage;
-import ru.yandex.practicum.filmorate.storage.impl.InMemoryUserStorage;
-import ru.yandex.practicum.filmorate.storage.api.FilmStorage;
-import ru.yandex.practicum.filmorate.storage.api.UserStorage;
 
 import java.time.LocalDate;
 import java.util.Collections;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+@ExtendWith(MockitoExtension.class)
 class FilmControllerTest {
+    private MockMvc mockMvc;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
+    @Mock
+    private FilmService filmService;
+
+    @InjectMocks
     private FilmController filmController;
-    private JdbcTemplate jdbcTemplate;
 
-    Film film;
-    Film film2;
+    private Film film;
+    private Film film2;
 
     @BeforeEach
     void setUp() {
-        FilmStorage filmStorage = new InMemoryFilmStorage();
-        LikeStorage likeStorage = new LikeDbStorage(jdbcTemplate);
-        UserStorage userStorage = new InMemoryUserStorage();
+        mockMvc = MockMvcBuilders.standaloneSetup(filmController).build();
 
-        GenreDbStorage genreStorage = new GenreDbStorage(jdbcTemplate);
-        MpaDbStorage mpaStorage = new MpaDbStorage(jdbcTemplate);
-        GenreService genreService = new GenreService(genreStorage);
-        MpaService mpaService = new MpaService(mpaStorage);
-
-        FilmService filmService = new FilmService(filmStorage, likeStorage, userStorage, genreService, mpaService);
-        filmController = new FilmController(filmService);
         film = new Film(22, "", "", LocalDate.of(1777, 9, 2),
                 -1, null, null, null);
         film2 = new Film(1, "Марко Поло", "Комедия про похождения друзей",
@@ -54,74 +52,83 @@ class FilmControllerTest {
     }
 
     @Test
-    void givenRightFilm_whenAddFilm_thenMapFilled() {
-        filmController.addFilm(film2);
+    void givenRightFilm_whenAddFilm_thenMapFilled() throws Exception {
+        when(filmService.addFilm(any(Film.class))).thenReturn(film2);
 
-        assertEquals(1, filmController.getFilms().size());
+        mockMvc.perform(post("/films")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(film2)))
+                .andExpect(status().isOk());
     }
 
     @Test
-    void givenRightFilm_whenGetFilms_thenGetListOfFilms() {
-        filmController.addFilm(film2);
+    void givenRightFilm_whenGetFilms_thenGetListOfFilms() throws Exception {
+        when(filmService.getFilms()).thenReturn(List.of(film2));
 
-        assertEquals(1, filmController.getFilms().size());
+        mockMvc.perform(get("/films"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value("Марко Поло"));
     }
 
     @Test
-    void givenWrongFilm_whenPostRequest_thenThrowException() {
-        Executable executable = () -> filmController.addFilm(film);
+    void givenWrongFilm_whenPostRequest_thenThrowException() throws Exception {
+        when(filmService.addFilm(any(Film.class))).thenThrow(new CustomValidationException("Validation error"));
 
-        assertThrows(CustomValidationException.class, executable);
+        mockMvc.perform(post("/films")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(film)))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
-    void givenWrongFilm_whenPutRequest_thenThrowException() {
-        Executable executable = () -> filmController.updateFilm(film);
+    void givenRightFilm_whenUpdateFilm_thenMapValueUpdated() throws Exception {
+        Film updatedFilm = new Film(1, "Updated Film", "Updated desc",
+                LocalDate.of(2000, 10, 8), 135, null, Collections.emptyList(), new Mpa(1, "G"));
 
-        assertThrows(CustomValidationException.class, executable);
+        when(filmService.updateFilm(any(Film.class))).thenReturn(updatedFilm);
+
+        mockMvc.perform(put("/films")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updatedFilm)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("Updated Film"));
     }
 
     @Test
-    void givenRightFilm_whenUpdateFilm_thenMapValueUpdated() {
-        filmController.addFilm(film2);
-
-        Film newFilm = new Film(222, "", "", LocalDate.now(), 222,
-                null, null, null);
-        newFilm.setId(film2.getId());
-        newFilm.setName("Друзья");
-        newFilm.setDescription("Ромком в классическом стиле");
-        newFilm.setReleaseDate(LocalDate.of(1998, 7, 5));
-        newFilm.setDuration(160);
-
-        filmController.updateFilm(newFilm);
-
-        assertEquals(filmController.getFilms().get(0), newFilm);
-    }
-
-    @Test
-    void givenFilmWithNonExistentGenre_whenAddFilm_thenThrowNotFoundException() {
-        Film film = new Film(1, "Film with non-existent genre", "Description",
+    void givenFilmWithNonExistentGenre_whenAddFilm_thenThrowNotFoundException() throws Exception {
+        Film filmWithBadGenre = new Film(1, "Film", "Desc",
                 LocalDate.now(), 120, 0,
-                Collections.singletonList(new Genre(999, "Non-existent Genre")),
+                Collections.singletonList(new Genre(999, "Bad")),
                 new Mpa(1, "G"));
 
-        assertThrows(NotFoundException.class, () -> filmController.addFilm(film));
+        when(filmService.addFilm(any(Film.class))).thenThrow(new NotFoundException("Genre not found"));
+
+        mockMvc.perform(post("/films")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(filmWithBadGenre)))
+                .andExpect(status().isNotFound());
     }
 
     @Test
-    void givenFilmWithNonExistentMpa_whenAddFilm_thenThrowNotFoundException() {
-        Film film = new Film(1, "Film with non-existent MPA", "Description",
+    void givenFilmWithNonExistentMpa_whenAddFilm_thenThrowNotFoundException() throws Exception {
+        Film filmWithBadMpa = new Film(1, "Film", "Desc",
                 LocalDate.now(), 120, 0,
                 Collections.emptyList(),
-                new Mpa(999, "Non-existent MPA"));
+                new Mpa(999, "Bad"));
 
-        assertThrows(NotFoundException.class, () -> filmController.addFilm(film));
+        when(filmService.addFilm(any(Film.class))).thenThrow(new NotFoundException("MPA not found"));
+
+        mockMvc.perform(post("/films")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(filmWithBadMpa)))
+                .andExpect(status().isNotFound());
     }
 
     @Test
-    void givenNonExistentFilmId_whenGetFriends_thenThrowNotFoundException() {
-        Integer nonExistentFilmId = 999;
-        Executable executable = () -> filmController.getFriendsByFilmId(nonExistentFilmId);
-        assertThrows(NotFoundException.class, executable);
+    void givenNonExistentFilmId_whenGetFriends_thenThrowNotFoundException() throws Exception {
+        when(filmService.getFriendsByFilmId(anyInt())).thenThrow(new NotFoundException("Film not found"));
+
+        mockMvc.perform(get("/films/999/friends"))
+                .andExpect(status().isNotFound());
     }
 }

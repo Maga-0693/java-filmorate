@@ -15,10 +15,7 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.GenreService;
 import ru.yandex.practicum.filmorate.service.MpaService;
 import ru.yandex.practicum.filmorate.storage.api.*;
-import ru.yandex.practicum.filmorate.storage.dao.FilmDbStorage;
-import ru.yandex.practicum.filmorate.storage.dao.GenreDbStorage;
-import ru.yandex.practicum.filmorate.storage.dao.LikeDbStorage;
-import ru.yandex.practicum.filmorate.storage.dao.UserDbStorage;
+import ru.yandex.practicum.filmorate.storage.dao.*;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -27,9 +24,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @JdbcTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-@Import({LikeDbStorage.class, UserDbStorage.class})
+@Import({LikeDbStorage.class, UserDbStorage.class, MpaDbStorage.class})
 public class FilmDbStorageTest {
 
+    @Autowired
     private final JdbcTemplate jdbcTemplate;
     private FilmStorage filmStorage;
     @MockBean
