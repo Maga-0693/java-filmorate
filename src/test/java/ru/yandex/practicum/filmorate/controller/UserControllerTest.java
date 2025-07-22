@@ -2,76 +2,85 @@ package ru.yandex.practicum.filmorate.controller;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
-import ru.yandex.practicum.filmorate.exception.CustomValidationException;
+import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.impl.InMemoryUserStorage;
-import ru.yandex.practicum.filmorate.storage.api.UserStorage;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
 import java.time.LocalDate;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class UserControllerTest {
-
-    private UserController userController;
-
-    User user1;
-    User user2;
+@SpringBootTest
+public class UserControllerTest {
+    private Validator validator;
+    private User user;
 
     @BeforeEach
     void setUp() {
-        UserStorage userStorage = new InMemoryUserStorage();
-        UserService userService = new UserService(userStorage);
-        userController = new UserController(userService);
-        user1 = new User(1, "", "", "", LocalDate.of(2222, 10, 10),
-                null);
-        user2 = new User(0, "mail@mail.com", "Nagibator228", "Robert",
-                LocalDate.of(1989, 9, 13), null);
+        validator = Validation.buildDefaultValidatorFactory().getValidator();
+        user = new User();
+        user.setEmail("email@example.com");
+        user.setLogin("login");
+        user.setBirthday(LocalDate.of(2000, 1, 1));
     }
 
     @Test
-    void whenGetUsers_thenGetListOfUsers() {
-        userController.addUser(user2);
-        User newUser = user2;
-
-        assertEquals(newUser, userController.getUsers().get(0));
+    void whenEmailIsBlank_thenValidationFails() {
+        user.setEmail(" ");
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v ->
+                v.getMessage().contains("Электронная почта не может быть пустой") ||
+                        v.getMessage().contains("Электронная почта должна содержать символ @")));
     }
 
     @Test
-    void givenUser_whenAddUserMethod_thenFillMap() {
-        userController.addUser(user2);
-
-        assertEquals(1, userController.getUsers().size());
+    void whenEmailHasNoAtSymbol_thenValidationFails() {
+        user.setEmail("email.example.com");
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertFalse(violations.isEmpty());
+        assertEquals("Электронная почта должна содержать символ @", violations.iterator().next().getMessage());
     }
 
     @Test
-    void givenUser_whenUpdateUserMethod_thenFillMap() {
-        userController.addUser(user2);
-        User newUser = new User(1212, "", "", "", LocalDate.now(), null);
-        newUser.setId(1);
-        newUser.setEmail("mmm@mmm.mm");
-        newUser.setLogin("Rocky");
-        newUser.setName("Stanislav");
-        newUser.setBirthday(LocalDate.of(1995, 5, 7));
-
-        userController.updateUser(newUser);
-
-        assertEquals(newUser, userController.getUsers().get(0));
+    void whenLoginIsBlank_thenValidationFails() {
+        user.setLogin(" ");
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertFalse(violations.isEmpty());
+        assertTrue(violations.stream().anyMatch(v ->
+                v.getMessage().contains("Логин не может быть пустым") ||
+                        v.getMessage().contains("Логин не может содержать пробелы")));
     }
 
     @Test
-    void givenWrongUser_whenPostRequest_thenThrowException() {
-        Executable executable = () -> userController.addUser(user1);
-
-        assertThrows(CustomValidationException.class, executable);
+    void whenLoginHasSpaces_thenValidationFails() {
+        user.setLogin("log in");
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertFalse(violations.isEmpty());
+        assertEquals("Логин не может содержать пробелы", violations.iterator().next().getMessage());
     }
 
     @Test
-    void givenWrongUser_whenPutRequest_thenThrowException() {
-        Executable executable = () -> userController.updateUser(user1);
+    void whenBirthdayIsInFuture_thenValidationFails() {
+        user.setBirthday(LocalDate.now().plusDays(1));
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertFalse(violations.isEmpty());
+        assertEquals("Дата рождения не может быть в будущем", violations.iterator().next().getMessage());
+    }
 
-        assertThrows(CustomValidationException.class, executable);
+    @Test
+    void whenNameIsEmpty_thenLoginUsedAsName() {
+        user.setName("");
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertTrue(violations.isEmpty());
+    }
+
+    @Test
+    void whenValidUser_thenNoValidationErrors() {
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        assertTrue(violations.isEmpty());
     }
 }
