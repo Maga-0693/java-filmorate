@@ -63,14 +63,16 @@ public class FilmService {
     }
 
     public Film addFilm(Film film) {
-        if (film.getGenres() != null) {
+        // Проверяем MPA
+        if (film.getMpa() != null) {
+            mpaService.getMpaById(film.getMpa().getId());
+        }
+
+        // Проверяем жанры
+        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
             for (Genre genre : film.getGenres()) {
                 genreService.getGenreById(genre.getId());
             }
-        }
-
-        if (film.getMpa() != null) {
-            mpaService.getMpaById(film.getMpa().getId());
         }
 
         return filmStorage.addFilm(film);

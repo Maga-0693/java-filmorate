@@ -13,7 +13,9 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 import ru.yandex.practicum.filmorate.service.GenreService;
 import ru.yandex.practicum.filmorate.service.MpaService;
 import ru.yandex.practicum.filmorate.storage.api.LikeStorage;
+import ru.yandex.practicum.filmorate.storage.dao.GenreDbStorage;
 import ru.yandex.practicum.filmorate.storage.dao.LikeDbStorage;
+import ru.yandex.practicum.filmorate.storage.dao.MpaDbStorage;
 import ru.yandex.practicum.filmorate.storage.impl.InMemoryFilmStorage;
 import ru.yandex.practicum.filmorate.storage.impl.InMemoryUserStorage;
 import ru.yandex.practicum.filmorate.storage.api.FilmStorage;
@@ -37,14 +39,18 @@ class FilmControllerTest {
         FilmStorage filmStorage = new InMemoryFilmStorage();
         LikeStorage likeStorage = new LikeDbStorage(jdbcTemplate);
         UserStorage userStorage = new InMemoryUserStorage();
-        GenreService genreService = new GenreService(null);
-        MpaService mpaService = new MpaService(null);
+
+        GenreDbStorage genreStorage = new GenreDbStorage(jdbcTemplate);
+        MpaDbStorage mpaStorage = new MpaDbStorage(jdbcTemplate);
+        GenreService genreService = new GenreService(genreStorage);
+        MpaService mpaService = new MpaService(mpaStorage);
+
         FilmService filmService = new FilmService(filmStorage, likeStorage, userStorage, genreService, mpaService);
         filmController = new FilmController(filmService);
         film = new Film(22, "", "", LocalDate.of(1777, 9, 2),
                 -1, null, null, null);
         film2 = new Film(1, "Марко Поло", "Комедия про похождения друзей",
-                LocalDate.of(2000, 10, 8), 135, null, null, null);
+                LocalDate.of(2000, 10, 8), 135, null, Collections.emptyList(), new Mpa(1, "G"));
     }
 
     @Test
@@ -94,16 +100,22 @@ class FilmControllerTest {
 
     @Test
     void givenFilmWithNonExistentGenre_whenAddFilm_thenThrowNotFoundException() {
-        Film film = new Film(1, "Film with non-existent genre", "Description", LocalDate.now(), 120, 0, Collections.singletonList(new Genre(999, "Non-existent Genre")), new Mpa(1, "G"));
-        Executable executable = () -> filmController.addFilm(film);
-        assertThrows(NotFoundException.class, executable);
+        Film film = new Film(1, "Film with non-existent genre", "Description",
+                LocalDate.now(), 120, 0,
+                Collections.singletonList(new Genre(999, "Non-existent Genre")),
+                new Mpa(1, "G"));
+
+        assertThrows(NotFoundException.class, () -> filmController.addFilm(film));
     }
 
     @Test
     void givenFilmWithNonExistentMpa_whenAddFilm_thenThrowNotFoundException() {
-        Film film = new Film(1, "Film with non-existent MPA", "Description", LocalDate.now(), 120, 0, Collections.emptyList(), new Mpa(999, "Non-existent MPA"));
-        Executable executable = () -> filmController.addFilm(film);
-        assertThrows(NotFoundException.class, executable);
+        Film film = new Film(1, "Film with non-existent MPA", "Description",
+                LocalDate.now(), 120, 0,
+                Collections.emptyList(),
+                new Mpa(999, "Non-existent MPA"));
+
+        assertThrows(NotFoundException.class, () -> filmController.addFilm(film));
     }
 
     @Test
