@@ -42,7 +42,7 @@ public class InMemoryUserStorage implements UserStorage {
             users.put(user.getId(), user);
             return user;
         } else {
-            throw new CustomValidationException("пользователь не найден");
+            throw new CustomValidationException("Пользователь не найден");
         }
     }
 
@@ -55,11 +55,11 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public Optional<User> getUserById(Integer id) {
         if (!users.containsKey(id)) {
-            throw new NotFoundException("Пользователя с id: " + id + " не найдено");
+            throw new NotFoundException("Пользователь с id: " + id + " не найден");
         }
         Optional<User> user = Optional.of(users.get(id));
         if (user.isPresent()) {
-            throw new NotFoundException("User not exist");
+            throw new NotFoundException("Пользователь не существует");
         }
         return user;
     }
@@ -73,7 +73,7 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public List<User> searchForUserFriends(int id) {
         return getUserById(id)
-                .orElseThrow(() -> new NotFoundException("User not exist"))
+                .orElseThrow(() -> new NotFoundException("Пользователь не существует"))
                 .getFriends();
     }
 
@@ -81,9 +81,9 @@ public class InMemoryUserStorage implements UserStorage {
     public void removeFriend(int userId, int friendId) {
         try {
             User user = getUserById(userId)
-                    .orElseThrow(() -> new NotFoundException("User not exist" + userId));
+                    .orElseThrow(() -> new NotFoundException("Пользователь не существует" + userId));
             User friend = getUserById(friendId)
-                    .orElseThrow(() -> new NotFoundException("User not exist" + friendId));
+                    .orElseThrow(() -> new NotFoundException("Пользователь не существует" + friendId));
             List<User> userFriends = user.getFriends();
             List<User> friendFriends = friend.getFriends();
             if (userFriends != null) {
@@ -93,16 +93,16 @@ public class InMemoryUserStorage implements UserStorage {
                 friendFriends.removeIf(u -> u.getId() == userId);
             }
         } catch (RuntimeException e) {
-            throw new NotFoundException("User not exist");
+            throw new NotFoundException("Пользователь не существует");
         }
     }
 
     @Override
     public void addFriend(int userId, int friendId) {
         User user = getUserById(userId)
-                .orElseThrow(() -> new NotFoundException("User not exist" + userId));
+                .orElseThrow(() -> new NotFoundException("Пользователь не существует" + userId));
         User friend = getUserById(friendId)
-                .orElseThrow(() -> new NotFoundException("User not exist" + friendId));
+                .orElseThrow(() -> new NotFoundException("Пользователь не существует" + friendId));
         List<User> userFriends = user.getFriends();
         List<User> friendFriends = friend.getFriends();
         if (userFriends != null) {
@@ -116,9 +116,9 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public List<User> searchForSameFriends(int userId, int friendId) {
         User user = getUserById(userId)
-                .orElseThrow(() -> new NotFoundException("User not exist" + userId));
+                .orElseThrow(() -> new NotFoundException("Пользователь не существует" + userId));
         User friend = getUserById(friendId)
-                .orElseThrow(() -> new NotFoundException("User not exist" + friendId));
+                .orElseThrow(() -> new NotFoundException("Пользователь не существует" + friendId));
         if (user != null && friend != null) {
             List<User> userFriends = user.getFriends();
             List<User> friendFriends = friend.getFriends();
@@ -128,10 +128,10 @@ public class InMemoryUserStorage implements UserStorage {
                 commonFriends.removeIf(u -> u.getId() == userId || u.getId() == friendId);
                 return new ArrayList<>(commonFriends);
             } else {
-                throw new NotFoundException("User's or friend's friend list is null");
+                throw new NotFoundException("Список друзей пользователя пустой");
             }
         } else {
-            throw new NotFoundException("User or friend does not exist");
+            throw new NotFoundException("Пользователь или друг не существует");
         }
     }
 

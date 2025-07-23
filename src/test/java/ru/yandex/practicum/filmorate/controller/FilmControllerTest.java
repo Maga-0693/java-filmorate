@@ -45,7 +45,7 @@ class FilmControllerTest {
     }
 
     @Test
-    void givenRightFilm_whenAddFilm_thenSuccess() {
+    void addFilm_success() {
         when(filmService.addFilm(any(Film.class))).thenReturn(validFilm);
 
         ResponseEntity<Film> response = filmController.addFilm(validFilm);
@@ -57,7 +57,7 @@ class FilmControllerTest {
     }
 
     @Test
-    void givenRightFilm_whenGetFilms_thenGetListOfFilms() {
+    void getFilms_success() {
         when(filmService.getFilms()).thenReturn(List.of(validFilm));
 
         List<Film> films = filmController.getFilms();
@@ -67,8 +67,8 @@ class FilmControllerTest {
     }
 
     @Test
-    void givenWrongFilm_whenPostRequest_thenThrowException() {
-        doThrow(new CustomValidationException("Invalid film data"))
+    void addInvalidFilm_throwsException() {
+        doThrow(new CustomValidationException("Неверные данные о фильме"))
                 .when(filmService).addFilm(invalidFilm);
 
         assertThrows(CustomValidationException.class,
@@ -78,7 +78,7 @@ class FilmControllerTest {
     }
 
     @Test
-    void givenRightFilm_whenUpdateFilm_thenSuccess() {
+    void updateFilm_success() {
         Film updatedFilm = new Film(1, "Updated", "Desc",
                 LocalDate.now(), 100, null, null, null);
 
@@ -91,22 +91,22 @@ class FilmControllerTest {
     }
 
     @Test
-    void givenFilmWithNonExistentGenre_whenAddFilm_thenThrowNotFoundException() {
+    void addFilmWithInvalidGenre_throwsNotFound() {
         Film filmWithBadGenre = new Film(1, "Film", "Desc",
                 LocalDate.now(), 120, null,
                 List.of(new Genre(999, "Bad")), new Mpa(1, "G"));
 
         when(filmService.addFilm(filmWithBadGenre))
-                .thenThrow(new NotFoundException("Genre not found"));
+                .thenThrow(new NotFoundException("Жанр не найден"));
 
         assertThrows(NotFoundException.class,
                 () -> filmController.addFilm(filmWithBadGenre));
     }
 
     @Test
-    void givenNonExistentFilmId_whenGetFriends_thenThrowNotFoundException() {
+    void getFriendsByInvalidId_throwsNotFound() {
         when(filmService.getFriendsByFilmId(999))
-                .thenThrow(new NotFoundException("Film not found"));
+                .thenThrow(new NotFoundException("Фильм не найден"));
 
         assertThrows(NotFoundException.class,
                 () -> filmController.getFriendsByFilmId(999));

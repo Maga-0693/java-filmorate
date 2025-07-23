@@ -18,7 +18,7 @@ import java.util.*;
 @Slf4j
 @Repository
 @AllArgsConstructor
-@Qualifier("userDaoStorageImpl")
+@Qualifier("userDbStorage")
 public class UserDbStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
@@ -46,7 +46,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public List<User> getUsers() {
         String query = "SELECT user_id, email, login, name_user, birthday FROM User_Filmorate";
-        log.debug("All users returned from DB");
+        log.debug("Все пользователи возвращены из БД");
         return jdbcTemplate.query(query, this::mapToUser);
     }
 
@@ -57,7 +57,7 @@ public class UserDbStorage implements UserStorage {
                 .usingGeneratedKeyColumns("user_id");
         Number key = simpleJdbcInsert.executeAndReturnKey(userToMap(user));
         user.setId((Integer) key);
-        log.debug("User with ID {} saved.", user.getId());
+        log.debug("Пользователь с ID {} сохранен.", user.getId());
         return user;
     }
 
@@ -78,9 +78,9 @@ public class UserDbStorage implements UserStorage {
                 user.getBirthday(),
                 userId);
         if (updateResult > 0) {
-            log.debug("User with ID {} has been updated.", userId);
+            log.debug("Пользователь с ID {} обновлен", userId);
         } else {
-            throw new NotFoundException("User not founded for update by ID=" + userId);
+            throw new NotFoundException("Пользователь не найден для обновления по ID=" + userId);
         }
         return user;
     }
@@ -90,9 +90,9 @@ public class UserDbStorage implements UserStorage {
         String query = "DELETE FROM User_Filmorate WHERE user_id=?";
         int deleteResult = jdbcTemplate.update(query, id);
         if (deleteResult > 0) {
-            log.info("User with ID {} has been removed.", id);
+            log.info("Пользователь с ID {} был удален", id);
         } else {
-            log.info("User with ID {} has not been deleted.", id);
+            log.info("Пользователь с ID {} не был удален", id);
         }
     }
 
@@ -102,22 +102,22 @@ public class UserDbStorage implements UserStorage {
                 "FROM User_Filmorate uf " +
                 "JOIN Friendship f ON uf.user_id = f.friend_id " +
                 "WHERE f.user_id = ?";
-        log.debug("All friends of user by ID {} returned from DB", id);
+        log.debug("Все друзья пользователя с ID {} возвращены в БД", id);
         return jdbcTemplate.query(query, this::mapToUser, id);
     }
 
     @Override
     public void removeFriend(int userId, int friendId) {
         if (!userExists(userId)) {
-            throw new NotFoundException("User not found with id: " + userId);
+            throw new NotFoundException("Пользователь не найден с id: " + userId);
         }
         if (!userExists(friendId)) {
-            throw new NotFoundException("User not found with id: " + friendId);
+            throw new NotFoundException("Пользователь не найден с id: " + friendId);
         }
 
         String query = "DELETE FROM Friendship WHERE user_id=? AND friend_id=?";
         jdbcTemplate.update(query, userId, friendId);
-        log.info("Removed friendship between {} and {}", userId, friendId);
+        log.info("Удалена дружба между {} и {}", userId, friendId);
     }
 
     private boolean userExists(int userId) {
@@ -128,8 +128,8 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public void addFriend(int userId, int friendId) {
-        getUserById(userId).orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
-        getUserById(friendId).orElseThrow(() -> new NotFoundException("User not found with id: " + friendId));
+        getUserById(userId).orElseThrow(() -> new NotFoundException("Пользователь не найден с id: " + userId));
+        getUserById(friendId).orElseThrow(() -> new NotFoundException("Пользователь не найден с id: " + friendId));
 
         String query = "INSERT INTO Friendship (user_id, friend_id) " +
                 "SELECT ?, ? " +
@@ -138,9 +138,9 @@ public class UserDbStorage implements UserStorage {
                 "WHERE user_id = ? AND friend_id = ?)";
         int insertResult = jdbcTemplate.update(query, userId, friendId, userId, friendId);
         if (insertResult == 0) {
-            throw new NotFoundException("Friendship already exists between users " + userId + " and " + friendId);
+            throw new NotFoundException("Дружба уже существует между " + userId + " и " + friendId);
         }
-        log.debug("User with ID {} has been added in friends of user by ID {}.", friendId, userId);
+        log.debug("Пользователь с ID {} добавлен в друзья пользователя с ID {}.", friendId, userId);
     }
 
     @Override
@@ -154,7 +154,7 @@ public class UserDbStorage implements UserStorage {
         while (sqlRowSet.next()) {
             int id = sqlRowSet.getInt("user_id");
             commonFriends.add(getUserById(id)
-                    .orElseThrow(() -> new NotFoundException("Common friend not exist in DB with ID=" + id)));
+                    .orElseThrow(() -> new NotFoundException("Общий друг не существует в БД с ID=" + id)));
         }
         return commonFriends;
     }

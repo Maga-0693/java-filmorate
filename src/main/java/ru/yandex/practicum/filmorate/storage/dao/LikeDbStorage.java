@@ -34,18 +34,18 @@ public class LikeDbStorage implements LikeStorage {
     @Override
     public ResponseEntity<String> unLike(Integer filmId, Integer userId) {
         if (userId < 1) {
-            throw new NotFoundException("User not exist");
+            throw new NotFoundException("Пользователь не существует");
         }
         if (filmId < 1) {
-            throw new NotFoundException("Film not exist");
+            throw new NotFoundException("Пользователь не существует");
         }
         String query = "DELETE FROM Like_Film WHERE film_id=? AND user_id=?";
         int deleteResult = jdbcTemplate.update(query, filmId, userId);
         if (deleteResult > 0) {
-            log.debug("User with ID {} has removed like for film by ID {}.", userId, filmId);
-            return ResponseEntity.ok("Like removed successfully");
+            log.debug("Пользователь с ID {} удалил лайк с фильма по ID {}.", userId, filmId);
+            return ResponseEntity.ok("Лайк успешно удален");
         } else {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Nothing to delete here");
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Здесь нечего удалять");
         }
     }
 

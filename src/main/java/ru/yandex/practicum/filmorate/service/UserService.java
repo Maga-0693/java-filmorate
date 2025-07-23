@@ -25,7 +25,7 @@ public class UserService {
         try {
             userStorage.addFriend(userId, friendId);
         } catch (EmptyResultDataAccessException e) {
-            throw new NotFoundException("User not found");
+            throw new NotFoundException("Пользователь не найден");
         }
     }
 
@@ -41,7 +41,7 @@ public class UserService {
         try {
             return userStorage.searchForUserFriends(id);
         } catch (EmptyResultDataAccessException e) {
-            throw new NotFoundException("User not found with id: " + id);
+            throw new NotFoundException("Не найден пользователь с id: " + id);
         }
     }
 
@@ -69,9 +69,9 @@ public class UserService {
     public User getUserById(int id) {
         try {
             return userStorage.getUserById(id)
-                    .orElseThrow(() -> new NotFoundException("User with id " + id + " does not exist."));
+                    .orElseThrow(() -> new NotFoundException("Пользователь с id " + id + " не существует"));
         } catch (EmptyResultDataAccessException e) {
-            throw new NotFoundException("User with id " + id + " does not exist.");
+            throw new NotFoundException("Пользователь с id " + id + " не существует");
         }
     }
 }

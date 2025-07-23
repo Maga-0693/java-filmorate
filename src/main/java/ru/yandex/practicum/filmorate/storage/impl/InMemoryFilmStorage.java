@@ -32,7 +32,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     public Film addFilm(Film film) {
         validateBody(film);
         if (film.getMpa() == null) {
-            throw new CustomValidationException("MPA must be specified");
+            throw new CustomValidationException("Рейтинг должен быть указан");
         }
         film.setId(id);
         films.put(id, film);
@@ -61,7 +61,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public Film getFilmById(Integer id) {
         if (!films.containsKey(id)) {
-            throw new NotFoundException("Фильма с указанным id: " + id + ", не найдено");
+            throw new NotFoundException("Фильм с указанным id: " + id + ", не найден");
         }
         return films.get(id);
     }
@@ -69,7 +69,7 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public void deleteFilmById(Integer id) {
         if (!films.containsKey(id)) {
-            throw new NotFoundException("Фильма с указанным id: " + id + ", не найдено");
+            throw new NotFoundException("Фильм с указанным id: " + id + ", не найден");
         } else {
             films.remove(id);
         }

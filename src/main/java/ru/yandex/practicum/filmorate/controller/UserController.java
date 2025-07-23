@@ -20,31 +20,31 @@ public class UserController {
 
     @PostMapping
     public User addUser(@Valid @RequestBody User user) {
-        log.debug("POST request received to create new entity User");
+        log.debug("POST Запрос на создание нового пользователя");
         return userService.addUser(user);
     }
 
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
-        log.debug("PUT request received to update entity");
+        log.debug("PUT запрос на обновление пользователя");
         return userService.updateUser(user);
     }
 
     @GetMapping
     public List<User> getUsers() {
-        log.debug("GET request received to receive all users");
+        log.debug("GET запрос на получение всех пользователей");
         return userService.getUsers();
     }
 
     @GetMapping("/{id}")
     public User getUserById(@PathVariable Integer id) {
-        log.debug("GET request received to receive user by given id= {}", id);
+        log.debug("GET запрос на получение пользователя по указанному id= {}", id);
         return userService.getUserById(id);
     }
 
     @PutMapping("/{id}/friends/{friendId}")
     public void addFriend(@PathVariable(value = "id") Integer id, @PathVariable(value = "friendId") Integer friendId) {
-        log.debug("PUT request received to add friendly relations by given user id= {} and friend id= {}", id, friendId);
+        log.debug("PUT запрос на добавление дружеских отношений пользователя по id= {} и друга по id= {}", id, friendId);
         userService.getUserById(id);
         userService.getUserById(friendId);
         userService.addFriend(id, friendId);
@@ -52,21 +52,21 @@ public class UserController {
 
     @DeleteMapping("/{id}/friends/{friendId}")
     public void removeFriend(@PathVariable(value = "id") Integer id, @PathVariable(value = "friendId") Integer friendId) {
-        log.debug("DELETE request received to remove entity from friend list by given core user " +
-                "id= {} and friend id= {}", id, friendId);
+        log.debug("DELETE запрос на удаление из списка друзей от указанного пользователя " +
+                "id= {} и друга по id= {}", id, friendId);
         userService.removeFriend(id, friendId);
     }
 
     @GetMapping("/{id}/friends")
     public List<User> searchForUserFriends(@PathVariable Integer id) {
-        log.debug("GET request received to receive user friend list by given user id= {} ", id);
+        log.debug("GET запрос на получение списка друзей пользователя по указанному id= {} ", id);
         userService.getUserById(id);
         return userService.searchForUserFriends(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> searchForSameFriends(@PathVariable Integer id, @PathVariable Integer otherId) {
-        log.debug("GET request received to search for common friends if they exist");
+        log.debug("GET запрос на поиск общих друзей, если они существуют");
         return userService.searchForSameFriends(id, otherId);
     }
 }

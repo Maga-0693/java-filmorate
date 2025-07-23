@@ -18,9 +18,9 @@ public class MpaService {
     public Mpa getMpaById(int id) {
         try {
             return mpaStorage.getMpaById(id)
-                    .orElseThrow(() -> new NotFoundException("Mpa not exist by id=" + id));
+                    .orElseThrow(() -> new NotFoundException("Не существует рейтинг с id=" + id));
         } catch (EmptyResultDataAccessException e) {
-            throw new NotFoundException("Mpa not exist by id=" + id);
+            throw new NotFoundException("Не существует рейтинг с id=" + id);
         }
     }
 

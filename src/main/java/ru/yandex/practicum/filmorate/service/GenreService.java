@@ -18,9 +18,9 @@ public class GenreService {
     public Genre getGenreById(int id) {
         try {
             return genreStorage.getById(id)
-                    .orElseThrow(() -> new NotFoundException("Genre not exist by id=" + id));
+                    .orElseThrow(() -> new NotFoundException("Не существует жанра с id=" + id));
         } catch (EmptyResultDataAccessException e) {
-            throw new NotFoundException("Genre not exist by id=" + id);
+            throw new NotFoundException("Не существует жанра с id=" + id);
         }
     }
 

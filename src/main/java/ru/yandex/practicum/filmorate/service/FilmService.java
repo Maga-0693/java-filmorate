@@ -43,10 +43,10 @@ public class FilmService {
 
     public void unlike(Integer filmId, Integer userId) {
         if (userId < 1) {
-            throw new NotFoundException("User not exist");
+            throw new NotFoundException("Пользователь не существует");
         }
         if (filmId < 1) {
-            throw new NotFoundException("Film not exist");
+            throw new NotFoundException("Фильм не существует");
         }
         getFilmById(filmId);
         userStorage.getUserById(userId);
@@ -96,7 +96,7 @@ public class FilmService {
     public List<User> getFriendsByFilmId(Integer filmId) {
         Film film = filmStorage.getFilmById(filmId);
         if (film == null) {
-            throw new NotFoundException("Film with id " + filmId + " does not exist.");
+            throw new NotFoundException("Фильм с id " + filmId + " не существует");
         }
         return getFriendsForFilm(filmId);
     }
@@ -117,6 +117,7 @@ public class FilmService {
     }
 
     private List<User> getFriendsForFilm(Integer filmId) {
+
         return Collections.emptyList();
     }
 }
