@@ -2,11 +2,14 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.FilmService;
+
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -25,9 +28,9 @@ public class FilmController {
     }
 
     @PostMapping
-    public Film addFilm(@RequestBody Film film) {
+    public ResponseEntity<Film> addFilm(@Valid @RequestBody Film film) {
         log.debug("POST request received to create new film");
-        return filmService.addFilm(film);
+        return ResponseEntity.status(HttpStatus.CREATED).body(filmService.addFilm(film));
     }
 
     @PutMapping

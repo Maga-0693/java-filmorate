@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.CustomValidationException;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -12,6 +13,7 @@ import ru.yandex.practicum.filmorate.storage.api.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.api.LikeStorage;
 import ru.yandex.practicum.filmorate.storage.api.UserStorage;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -63,6 +65,7 @@ public class FilmService {
     }
 
     public Film addFilm(Film film) {
+        validateFilm(film);
         if (film.getMpa() != null) {
             mpaService.getMpaById(film.getMpa().getId());
         }
@@ -72,7 +75,6 @@ public class FilmService {
                 genreService.getGenreById(genre.getId());
             }
         }
-
         return filmStorage.addFilm(film);
     }
 
@@ -97,6 +99,21 @@ public class FilmService {
             throw new NotFoundException("Film with id " + filmId + " does not exist.");
         }
         return getFriendsForFilm(filmId);
+    }
+
+    private void validateFilm(Film film) {
+        if (film.getName() == null || film.getName().isBlank()) {
+            throw new CustomValidationException("Название фильма не может быть пустым");
+        }
+        if (film.getDescription() != null && film.getDescription().length() > 200) {
+            throw new CustomValidationException("Описание фильма не может быть длиннее 200 символов");
+        }
+        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
+            throw new CustomValidationException("Дата релиза не может быть раньше 28 декабря 1895 года");
+        }
+        if (film.getDuration() <= 0) {
+            throw new CustomValidationException("Продолжительность фильма должна быть положительной");
+        }
     }
 
     private List<User> getFriendsForFilm(Integer filmId) {

@@ -108,7 +108,6 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public void removeFriend(int userId, int friendId) {
-        // Проверяем существование обоих пользователей перед удалением
         if (!userExists(userId)) {
             throw new NotFoundException("User not found with id: " + userId);
         }
@@ -129,7 +128,6 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public void addFriend(int userId, int friendId) {
-        // Проверяем существование пользователей
         getUserById(userId).orElseThrow(() -> new NotFoundException("User not found with id: " + userId));
         getUserById(friendId).orElseThrow(() -> new NotFoundException("User not found with id: " + friendId));
 
