@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +11,10 @@ import org.springframework.test.annotation.DirtiesContext;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.service.GenreService;
+import ru.yandex.practicum.filmorate.service.MpaService;
 import ru.yandex.practicum.filmorate.storage.api.*;
-import ru.yandex.practicum.filmorate.storage.dao.FilmDbStorage;
-import ru.yandex.practicum.filmorate.storage.dao.GenreDbStorage;
-import ru.yandex.practicum.filmorate.storage.dao.LikeDbStorage;
-import ru.yandex.practicum.filmorate.storage.dao.UserDbStorage;
+import ru.yandex.practicum.filmorate.storage.dao.*;
 
 import java.time.LocalDate;
 import java.util.Collections;
@@ -24,25 +22,32 @@ import java.util.Collections;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @JdbcTest
-@RequiredArgsConstructor(onConstructor_ = @Autowired)
-@Import({LikeDbStorage.class, UserDbStorage.class})
+@Import({LikeDbStorage.class, UserDbStorage.class, MpaDbStorage.class})
 public class FilmDbStorageTest {
 
-    private final JdbcTemplate jdbcTemplate;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @MockBean
+    private LikeStorage likeStorage;
+
+    @MockBean
+    private MpaStorage mpaStorage;
+
+    @MockBean
+    private UserStorage userStorage;
+
     private FilmStorage filmStorage;
-    @MockBean
-    private final LikeStorage likeStorage;
-    @MockBean
-    private final MpaStorage mpaStorage;
-    private final UserStorage userStorage;
     private Film film;
 
     @BeforeEach
     void set() {
         GenreStorage genreStorage = new GenreDbStorage(jdbcTemplate);
+        GenreService genreService = new GenreService(genreStorage);
+        MpaService mpaService = new MpaService(mpaStorage);
         filmStorage = new FilmDbStorage(jdbcTemplate, genreStorage, likeStorage, mpaStorage);
 
-        FilmService filmService = new FilmService(filmStorage, likeStorage, userStorage);
+        FilmService filmService = new FilmService(filmStorage, likeStorage, userStorage, genreService, mpaService);
         film = new Film(0, "Film1", "descFilm1", LocalDate.of(2023, 1, 1), 100, 1, Collections.emptyList(), new Mpa(1, "G"));
     }
 

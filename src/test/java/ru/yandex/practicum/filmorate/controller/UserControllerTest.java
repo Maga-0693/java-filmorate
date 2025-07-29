@@ -32,7 +32,7 @@ class UserControllerTest {
     }
 
     @Test
-    void whenGetUsers_thenGetListOfUsers() {
+    void getUsers_returnsList() {
         userController.addUser(user2);
         User newUser = user2;
 
@@ -40,14 +40,14 @@ class UserControllerTest {
     }
 
     @Test
-    void givenUser_whenAddUserMethod_thenFillMap() {
+    void addUser_fillsMap() {
         userController.addUser(user2);
 
         assertEquals(1, userController.getUsers().size());
     }
 
     @Test
-    void givenUser_whenUpdateUserMethod_thenFillMap() {
+    void updateUser_fillsMap() {
         userController.addUser(user2);
         User newUser = new User(1212, "", "", "", LocalDate.now(), null);
         newUser.setId(1);
@@ -62,14 +62,14 @@ class UserControllerTest {
     }
 
     @Test
-    void givenWrongUser_whenPostRequest_thenThrowException() {
+    void addInvalidUser_throwsException() {
         Executable executable = () -> userController.addUser(user1);
 
         assertThrows(CustomValidationException.class, executable);
     }
 
     @Test
-    void givenWrongUser_whenPutRequest_thenThrowException() {
+    void updateInvalidUser_throwsException() {
         Executable executable = () -> userController.updateUser(user1);
 
         assertThrows(CustomValidationException.class, executable);

@@ -80,7 +80,7 @@ public class FilmDbStorage implements FilmStorage {
                 jdbcTemplate.update(query, film.getId(), genre.getId());
             }
         }
-        log.debug("Film with ID {} saved.", film.getId());
+        log.debug("Фильм с ID {} сохранен.", film.getId());
         return film;
     }
 
@@ -99,9 +99,9 @@ public class FilmDbStorage implements FilmStorage {
                 film.getMpa().getId(),
                 filmId);
         if (updateResult > 0) {
-            log.debug("Film with ID {} has been updated.", filmId);
+            log.debug("Фильм с ID {} обновлен", filmId);
         } else {
-            throw new NotFoundException("Film not founded for update by ID=" + filmId);
+            throw new NotFoundException("Фильм не найден для обновления по ID=" + filmId);
         }
         if (!film.getGenres().isEmpty()) {
             String querySql = "DELETE FROM Genre_Film WHERE film_id =?";
@@ -134,7 +134,7 @@ public class FilmDbStorage implements FilmStorage {
                     "mpa_id FROM Film WHERE film_id = ?";
             return jdbcTemplate.queryForObject(sqlQuery, mapToFilm(), id);
         } catch (EmptyResultDataAccessException e) {
-            throw new NotFoundException("Film not exist");
+            throw new NotFoundException("Фильм не существует");
         }
     }
 
@@ -143,9 +143,9 @@ public class FilmDbStorage implements FilmStorage {
         String query = "DELETE FROM Film WHERE film_id=?";
         int deleteResult = jdbcTemplate.update(query, id);
         if (deleteResult > 0) {
-            log.debug("Film with ID {} has been removed.", id);
+            log.debug("Фильм с ID {} был удален", id);
         } else {
-            log.debug("Film with ID {} has not been deleted.", id);
+            log.debug("Фильм с ID {} не был удален", id);
         }
     }
 
@@ -168,9 +168,9 @@ public class FilmDbStorage implements FilmStorage {
             throw new BadRequestException("Ошибка при валидации фильма, не заполнено поле name= " + film.getName());
         }
         if (film.getDescription().length() > 200) {
-            log.debug("Ошибка при валидации фильма, длина поля description >200, а именно= {}",
+            log.debug("Ошибка при валидации фильма, длина поля описания >200, а именно= {}",
                     film.getDescription().length());
-            throw new BadRequestException("Ошибка при валидации фильма, длина поля description >200, а именно= "
+            throw new BadRequestException("Ошибка при валидации фильма, длина поля описания >200, а именно= "
                     + film.getDescription().length());
         }
         if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
